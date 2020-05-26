@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net.Http;
 using Newtonsoft.Json;
 using Xunit;
 using Amazon.Lambda.TestUtilities;
@@ -12,31 +9,16 @@ namespace HelloWorld.Tests
 {
   public class FunctionTest
   {
-    private static readonly HttpClient client = new HttpClient();
-
-    private static async Task<string> GetCallingIP()
-    {
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Add("User-Agent", "AWS Lambda .Net Client");
-
-            var stringTask = client.GetStringAsync("http://checkip.amazonaws.com/").ConfigureAwait(continueOnCapturedContext:false);
-
-            var msg = await stringTask;
-            return msg.Replace("\n","");
-    }
-
-    [Fact]
-    public async Task TestHelloWorldFunctionHandler()
+      [Fact]
+    public void TestHelloWorldFunctionHandler()
     {
             var request = new APIGatewayProxyRequest();
             var context = new TestLambdaContext();
-            var location = GetCallingIP().Result;
             var message =
                 $"Hello David - the time on the server is {DateTime.Now.ToShortTimeString()} on {DateTime.Now.ToLongDateString()}";
             var body = new Dictionary<string, string>
             {
                 { "message", message },
-                { "location", location },
             };
 
             var expectedResponse = new APIGatewayProxyResponse
@@ -47,7 +29,7 @@ namespace HelloWorld.Tests
             };
 
             var function = new Function();
-            var response = await function.HelloHandler(request, context);
+            var response = function.HelloHandler(request, context);
 
             Assert.Equal(expectedResponse.Body, response.Body);
             Assert.Equal(expectedResponse.Headers, response.Headers);
