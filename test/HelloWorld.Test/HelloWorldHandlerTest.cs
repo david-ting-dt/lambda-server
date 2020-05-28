@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Xunit;
 using Amazon.Lambda.TestUtilities;
@@ -7,10 +8,10 @@ using Amazon.Lambda.APIGatewayEvents;
 
 namespace HelloWorld.Tests
 {
-  public class FunctionTest
+  public class HelloWorldHandlerTest
   {
       [Fact]
-    public void TestHelloWorldFunctionHandler()
+    public async Task HelloClients_ShouldReturnCorrectResponse()
     {
             var request = new APIGatewayProxyRequest();
             var context = new TestLambdaContext();
@@ -28,8 +29,8 @@ namespace HelloWorld.Tests
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
 
-            var function = new Function();
-            var response = function.HelloHandler(request, context);
+            var function = new HelloWorldHandler();
+            var response = await function.HelloClients(request, context);
 
             Assert.Equal(expectedResponse.Body, response.Body);
             Assert.Equal(expectedResponse.Headers, response.Headers);
