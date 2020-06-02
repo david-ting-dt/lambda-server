@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
-using Amazon.S3;
+using HelloWorld.Interfaces;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -15,11 +14,12 @@ namespace HelloWorld
 
     public class HelloWorldHandler
     {
-        private readonly AmazonS3Client _client = new AmazonS3Client();
+        private readonly IDataStore _dataStore = new S3DataStore();
         public async Task<APIGatewayProxyResponse> HelloClients(APIGatewayProxyRequest apigProxyEvent, ILambdaContext context)
         {
-            var names = await GetNamesFromS3Bucket();
-            var message = GetHelloMessage(names);
+            var names = await _dataStore.Get();
+            using var sr = new StreamReader(names);
+            var message = GetHelloMessage(await sr.ReadToEndAsync());
             var body = new Dictionary<string, string>
             {
                 { "message", message },
@@ -31,21 +31,6 @@ namespace HelloWorld
                 StatusCode = 200,
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
-        }
-
-        private async Task<string> GetNamesFromS3Bucket()
-        {
-            const string bucketName = "david-ting-hello-world";
-            var keys = (await _client.ListObjectsAsync(bucketName)).S3Objects.Select(o => o.Key);
-            var names = new List<string>();
-            foreach (var key in keys)
-            {
-                var obj = await _client.GetObjectAsync(bucketName, key);
-                using var sr = new StreamReader(obj.ResponseStream);
-                names.Add(await sr.ReadToEndAsync());
-            }
-
-            return string.Join(", ", names);
         }
 
         private static string GetHelloMessage(string name)
