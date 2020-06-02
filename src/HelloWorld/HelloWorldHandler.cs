@@ -15,7 +15,7 @@ namespace HelloWorld
     public class HelloWorldHandler
     {
         private readonly IDataStore _dataStore = new S3DataStore();
-        public async Task<APIGatewayProxyResponse> HelloClients(APIGatewayProxyRequest apigProxyEvent, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> HelloWorld(APIGatewayProxyRequest apigProxyEvent, ILambdaContext context)
         {
             var names = await _dataStore.Get();
             using var sr = new StreamReader(names);

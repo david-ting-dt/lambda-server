@@ -30,7 +30,7 @@ namespace HelloWorld.Tests
             };
 
             var function = new HelloWorldHandler();
-            var response = await function.HelloClients(request, context);
+            var response = await function.HelloWorld(request, context);
 
             Assert.Equal(expectedResponse.Body, response.Body);
             Assert.Equal(expectedResponse.Headers, response.Headers);
