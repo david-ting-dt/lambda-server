@@ -13,12 +13,10 @@ namespace HelloWorld
 
         public async Task<APIGatewayProxyResponse> GetPeopleNames()
         {
-            var dataStream = await _dataStore.Get();
-            using var sr = new StreamReader(dataStream);
-            var names = await sr.ReadToEndAsync();
+            var names = await _dataStore.Get();
             var body = new Dictionary<string, string>
             {
-                {"names", names}
+                {"names", string.Join(", ", names)}
             };
 
             return new APIGatewayProxyResponse
