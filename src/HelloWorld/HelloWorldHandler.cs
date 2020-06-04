@@ -15,11 +15,10 @@ namespace HelloWorld
     public class HelloWorldHandler
     {
         private readonly IDataStore _dataStore = new S3DataStore();
-        public async Task<APIGatewayProxyResponse> HelloWorld(APIGatewayProxyRequest apigProxyEvent, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> HelloWorld(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var names = await _dataStore.Get();
-            using var sr = new StreamReader(names);
-            var message = GetHelloMessage(await sr.ReadToEndAsync());
+            var message = GetHelloMessage(string.Join(", ", names));
             var body = new Dictionary<string, string>
             {
                 { "message", message },
