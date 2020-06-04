@@ -26,5 +26,16 @@ namespace HelloWorld
             using var sr = new StreamReader(objResponse.ResponseStream);
             return await sr.ReadToEndAsync();
         }
+        
+        public async Task<PutObjectResponse> Post(string requestBody)
+        {
+            var request = new PutObjectRequest
+            {
+                BucketName = BucketName,
+                Key = $"{requestBody}.txt",
+                ContentBody = requestBody
+            };
+            return await _s3Client.PutObjectAsync(request);
+        }
     }
 }
