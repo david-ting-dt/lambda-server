@@ -19,7 +19,6 @@ namespace HelloWorld
                 return new APIGatewayProxyResponse {StatusCode = 202};
 
             var response = await _dataStore.Post(requestBody);
-            Console.WriteLine($"request: {requestBody}");
             return new APIGatewayProxyResponse
             {
                 Body = requestBody,
