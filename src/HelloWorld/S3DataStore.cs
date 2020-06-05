@@ -37,5 +37,15 @@ namespace HelloWorld
             };
             return await _s3Client.PutObjectAsync(request);
         }
+
+        public async Task Delete(string key)
+        {
+            var request = new DeleteObjectRequest
+            {
+                BucketName = BucketName,
+                Key = $"{key}.txt",
+            };
+            await _s3Client.DeleteObjectAsync(request);
+        }
     }
 }
