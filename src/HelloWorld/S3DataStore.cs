@@ -15,25 +15,18 @@ namespace HelloWorld
         
         public async Task<List<string>> Get()
         {
-            var keys = (await _s3Client.ListObjectsAsync(BucketName)).S3Objects.Select(o => o.Key);
-            var names = await Task.WhenAll(keys.Select(GetNamesFromS3));
-            return names.ToList();
+            var keys = (await _s3Client.ListObjectsAsync(BucketName))
+                .S3Objects.Select(o => o.Key)
+                .ToList();
+            return keys;
         }
 
-        private async Task<string> GetNamesFromS3(string key)
-        {
-            var objResponse = await _s3Client.GetObjectAsync(BucketName, key);
-            using var sr = new StreamReader(objResponse.ResponseStream);
-            return await sr.ReadToEndAsync();
-        }
-        
-        public async Task<PutObjectResponse> Post(string requestBody)
+        public async Task<PutObjectResponse> Post(string key)
         {
             var request = new PutObjectRequest
             {
                 BucketName = BucketName,
-                Key = $"{requestBody}.txt",
-                ContentBody = requestBody
+                Key = key,
             };
             return await _s3Client.PutObjectAsync(request);
         }
@@ -43,9 +36,18 @@ namespace HelloWorld
             var request = new DeleteObjectRequest
             {
                 BucketName = BucketName,
-                Key = $"{key}.txt",
+                Key = key,
             };
             await _s3Client.DeleteObjectAsync(request);
+        }
+
+        public async Task Put(string key)
+        {
+            var request = new PutObjectRequest
+            {
+                BucketName = BucketName,
+                Key = key,
+            };
         }
     }
 }
