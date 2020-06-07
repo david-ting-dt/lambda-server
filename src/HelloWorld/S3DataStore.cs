@@ -41,13 +41,18 @@ namespace HelloWorld
             await _s3Client.DeleteObjectAsync(request);
         }
 
-        public async Task Put(string key)
+        public async Task Put(string oldKey, string newKey)
         {
-            var request = new PutObjectRequest
+            var request = new CopyObjectRequest
             {
-                BucketName = BucketName,
-                Key = key,
+                SourceBucket = BucketName,
+                DestinationBucket = BucketName,
+                SourceKey = oldKey,
+                DestinationKey = newKey
             };
+
+            await _s3Client.CopyObjectAsync(request);
+            await _s3Client.DeleteObjectAsync(BucketName, oldKey);
         }
     }
 }

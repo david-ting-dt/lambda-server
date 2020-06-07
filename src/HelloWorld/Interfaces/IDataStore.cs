@@ -8,7 +8,8 @@ namespace HelloWorld.Interfaces
     public interface IDataStore
     {
         public Task<List<string>> Get();
-        public Task<PutObjectResponse> Post(string requestBody);
+        public Task<PutObjectResponse> Post(string key);
         public Task Delete(string key);
+        public Task Put(string oldKey, string newKey);
     }
 }
