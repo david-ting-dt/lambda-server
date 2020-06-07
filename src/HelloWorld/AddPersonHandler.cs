@@ -26,7 +26,7 @@ namespace HelloWorld
                 Headers = new Dictionary<string, string>
                 {
                     {"Content-Type", "application/json"}, 
-                    {"Location", $"{request.Path}{requestBody}"}
+                    {"Location", $"{request.Path}/{requestBody}"}
                 }
             };
         }
