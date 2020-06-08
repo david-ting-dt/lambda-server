@@ -1,21 +1,23 @@
 AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: A sample SAM template for deploying Lambda functions.
-Resources:
-  HelloWorldHandler:
+Globals:
+  Function:
     Type: AWS::Serverless::Function
+    Runtime: dotnetcore3.1
+    MemorySize: 256
+    Timeout: 30
+    Role: 'arn:aws:iam::741922737521:role/service-role/HelloHandler-role-knj0rb9j'
+Resources:
+  HelloWorldFunction:
     Properties:
       Handler: HelloWorldHandler.HelloWorld
-      Runtime: dotnetcore3.1
-      MemorySize: 256
-      Timeout: 30
-      Role: 'arn:aws:iam::741922737521:role/service-role/HelloHandler-role-knj0rb9j'
       Events:
         HelloWorldAPI:
-          type: API
+          type: Api
           Properties:
             Path: /
-            Method: get
+            Method: GET
       Environment:
         variables:
           REGION: ap-southeast-2
