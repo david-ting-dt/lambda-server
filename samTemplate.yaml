@@ -8,7 +8,7 @@ Resources:
       Handler: HelloWorldHandler.HelloWorld
       Runtime: dotnetcore3.1
       MemorySize: 256
-      Timeout: 30,
+      Timeout: 30
       Role: 'arn:aws:iam::741922737521:role/service-role/HelloHandler-role-knj0rb9j'
       Events:
         HelloWorldAPI:
@@ -20,13 +20,13 @@ Resources:
         variables:
           REGION: ap-southeast-2
 
-  david-ting-GetPeopleNamesHandler:
+  GetPeopleNamesHandler:
     Type: AWS::Serverless::Function
     Properties:
       Handler: GetPeopleNamesHandler.GetPeopleNames
       Runtime: dotnetcore3.1
       MemorySize: 256
-      Timeout: 30,
+      Timeout: 30
       Role: 'arn:aws:iam::741922737521:role/service-role/HelloHandler-role-knj0rb9j'
       Events:
         HelloWorldAPI:
