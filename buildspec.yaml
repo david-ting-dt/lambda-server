@@ -1,10 +1,13 @@
 version: 0.1
 phases:
   install:
+    runtime-versions:
+      dotnet: 3.1
+  build:
     commands:
-      - aws cloudformation package --template-file AppSpec.yaml --s3-bucket david-ting-lambda-functions --output-template-file outputtemplate.yaml
+      - dotnet build
+      - dotnet test
 artifacts:
-  type: zip
   files:
     - AppSpec.yaml
     - outputtemplate.yaml
