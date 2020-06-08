@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A sample SAM template for deploying Lambda functions.
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: HelloWorldHandler.HelloWorld
+      Runtime: dotnetcore3.1
+      MemorySize: 256
+      Timeout: 30,
+      Role: 'arn:aws:iam::741922737521:role/service-role/HelloHandler-role-knj0rb9j'
+      Events:
+        HelloWorldAPI:
+          type: API
+          Properties:
+            Path: /
+            Method: get
+      Environment:
+        variables:
+          REGION: ap-southeast-2
+
+  GetPeopleNamesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: GetPeopleNamesHandler.GetPeopleNames
+      Runtime: dotnetcore3.1
+      MemorySize: 256
+      Timeout: 30,
+      Role: 'arn:aws:iam::741922737521:role/service-role/HelloHandler-role-knj0rb9j'
+      Events:
+        HelloWorldAPI:
+          type: API
+          Properties:
+            Path: /people
+            Method: get
+      Environment:
+        variables:
+          REGION: ap-southeast-2
