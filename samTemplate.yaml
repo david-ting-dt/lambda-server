@@ -2,7 +2,7 @@ AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: A sample SAM template for deploying Lambda functions.
 Resources:
-  arn:aws:lambda:ap-southeast-2:741922737521:function:HelloWorldHandler:
+  HelloWorldHandler:
     Type: AWS::Serverless::Function
     Properties:
       Handler: HelloWorldHandler.HelloWorld
