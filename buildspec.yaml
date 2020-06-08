@@ -1,4 +1,8 @@
 version: 0.1
+phases:
+  install:
+    commands:
+      - aws cloudformation package --template-file AppSpec.yaml --s3-bucket david-ting-lambda-functions --output-template-file outputtemplate.yaml
 artifacts:
   type: zip
   files:
