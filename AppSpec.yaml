@@ -1,0 +1,14 @@
+version: 0.0
+Resources:
+  - HelloWorldFunction:
+      Type: AWS::Lambda::Function
+      Properties:
+        Handler: HelloWorldHandler.HelloWorld
+        Name: "HelloWorldHandler"
+        Events:
+          HelloWorldAPI:
+            type: Api
+            Properties:
+              Path: /
+              Method: GET
+        
