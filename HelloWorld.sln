@@ -10,7 +10,6 @@ ProjectSection(SolutionItems) = preProject
 	README.md = README.md
 	.gitignore = .gitignore
 	buildspec.yaml = buildspec.yaml
-	AppSpec.yaml = AppSpec.yaml
 	lambdatemplate.yaml = lambdatemplate.yaml
 EndProjectSection
 EndProject

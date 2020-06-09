@@ -2,7 +2,15 @@ version: 0.2
 phases:
   build:
     commands:
-#      - dotnet test
+      - export BUCKET = david-ting-lambda-functions
+      - > 
+        aws cloudformation package 
+        --template-file lambdatemplate.yaml 
+        -- s3-bucket $BUCKET 
+        --output-template-file outputtemplate.yml
+      
 artifacts:
+  type: zip
   files:
-    - '**/*'
+    - lambdatemplate.yaml
+    - outputtemplate.yaml
