@@ -9,9 +9,9 @@ ProjectSection(SolutionItems) = preProject
 	omnisharp.json = omnisharp.json
 	README.md = README.md
 	.gitignore = .gitignore
-	samTemplate.yaml = samTemplate.yaml
 	buildspec.yaml = buildspec.yaml
 	AppSpec.yaml = AppSpec.yaml
+	lambdatemplate.yaml = lambdatemplate.yaml
 EndProjectSection
 EndProject
 Global

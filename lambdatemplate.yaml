@@ -12,6 +12,7 @@ Resources:
   HelloWorldFunction:
     Properties:
       Handler: HelloWorldHandler.HelloWorld
+      Code: ./HelloWorld.zip
       Events:
         HelloWorldAPI:
           type: Api
