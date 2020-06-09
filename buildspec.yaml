@@ -2,8 +2,7 @@ version: 0.2
 phases:
   build:
     commands:
-      - dotnet test
+#      - dotnet test
 artifacts:
   files:
-    - AppSpec.yaml
-    - outputtemplate.yaml
+    - '**/*'
