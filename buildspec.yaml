@@ -2,11 +2,10 @@ version: 0.2
 phases:
   build:
     commands:
-      - export BUCKET = david-ting-lambda-functions
       - > 
         aws cloudformation package 
         --template-file lambdatemplate.yaml 
-        -- s3-bucket $BUCKET 
+        -- s3-bucket "david-ting-lambda-functions"
         --output-template-file outputtemplate.yml
       
 artifacts:
