@@ -2,6 +2,8 @@ version: 0.2
 phases:
   build:
     commands:
+      - dotnet restore
+      - dotnet build
       - > 
         aws cloudformation package 
         --template-file lambdatemplate.yaml 
@@ -11,5 +13,6 @@ phases:
 artifacts:
   type: zip
   files:
+    - ./bin/Debug/netcoreapp3.1
     - lambdatemplate.yaml
     - outputtemplate.yaml
