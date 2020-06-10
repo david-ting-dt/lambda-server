@@ -7,9 +7,10 @@ Resources:
     Properties:
       Handler: HelloWorldHandler.HelloWorld
       Runtime: dotnetcore3.1
-      Code: ./HelloWorld/
+      Code: ./src/HelloWorld/
       Events:
         HelloWorldAPI:
           type: Api
           Properties:
             Path: /
+            Method: GET
