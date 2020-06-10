@@ -13,6 +13,6 @@ phases:
 artifacts:
   type: zip
   files:
-    - ./bin/Debug/netcoreapp3.0
+    - ./bin/Debug/netcoreapp3.1
     - lambdatemplate.yaml
     - outputtemplate.yaml
