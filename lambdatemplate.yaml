@@ -1,16 +1,73 @@
-AWSTemplateFormatVersion : '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: A sample SAM template for deploying Lambda functions.
+Description: Lambda functions for HelloWorldAPI
+
+Globals:
+  Function:
+    Runtime: dotnetcore3.1
+
 Resources:
-  HelloWorldFunction:
+  HelloWorldDNFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: s3://david-ting-lambda-functions/HelloWorldHandler.zip
       Handler: HelloWorldHandler.HelloWorld
-      Runtime: dotnetcore3.1
-      Code: ./src/HelloWorld/
+      Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
       Events:
-        HelloWorldAPI:
-          type: Api
+        HelloWorldDNApi:
+          Type: Api
           Properties:
             Path: /
             Method: GET
+
+  GetPeopleDNFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://david-ting-lambda-functions/david-ting-GetPeopleNamesHandler.zip
+      Handler: GetPeopleNamesHandler.GetPeopleNames
+      Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
+      Events:
+        HelloWorldDNApi:
+          Type: Api
+          Properties:
+            Path: /people
+            Method: GET
+
+  AddPersonDNFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://david-ting-lambda-functions/david-ting-AddPersonHandler.zip
+      Handler: AddPersonHandler.AddPerson
+      Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
+      Events:
+        HelloWorldDNApi:
+          Type: Api
+          Properties:
+            Path: /people
+            Method: POST
+
+  DeletePersonDNFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://david-ting-lambda-functions/david-ting-DeletePersonHandler.zip
+      Handler: DeletePersonHandler.DeletePerson
+      Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
+      Events:
+        HelloWorldDNApi:
+          Type: Api
+          Properties:
+            Path: /people/{name}
+            Method: DELETE
+
+  UpdatePersonDNFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://david-ting-lambda-functions/david-ting-UpdatePersonHandler.zip
+      Handler: UpdatePersonHandler.UpdatePerson
+      Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
+      Events:
+        HelloWorldDNApi:
+          Type: Api
+          Properties:
+            Path: /people/{name}
+            Method: PUT
