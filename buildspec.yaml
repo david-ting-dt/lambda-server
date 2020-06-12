@@ -8,7 +8,7 @@ phases:
         aws cloudformation package 
         --template-file lambdatemplate.yaml 
         --s3-bucket "david-ting-dn-lambda-deployment-artifacts"
-        --output-template-file outputtemplate.yml
+        --output-template-file outputtemplate.yaml
       
 artifacts:
   type: zip
