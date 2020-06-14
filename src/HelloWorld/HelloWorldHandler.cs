@@ -19,14 +19,10 @@ namespace HelloWorld
         {
             var names = await _dataStore.Get();
             var message = GetHelloMessage(string.Join(", ", names));
-            var body = new Dictionary<string, string>
-            {
-                { "message", message },
-            };
 
             return new APIGatewayProxyResponse
             {
-                Body = JsonConvert.SerializeObject(body),
+                Body = message,
                 StatusCode = 200,
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
