@@ -6,7 +6,7 @@ phases:
   pre_build:
     commands:
       - echo Restore started on `date`
-      - ls
+      - cd src/HelloWorld
       - dotnet clean
       - dotnet restore
   build:
@@ -21,6 +21,6 @@ phases:
 artifacts:
   type: zip
   files:
-    - ./bin/Debug/netcoreapp3.1/publish
+    - src/HelloWorld/bin/Debug/netcoreapp3.1/publish
     - lambdatemplate.yaml
     - outputtemplate.yaml
