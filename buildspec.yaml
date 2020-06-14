@@ -19,6 +19,4 @@ phases:
 artifacts:
   type: zip
   files:
-    - ./src/HelloWorld/bin/Debug/netcoreapp3.1/publish
-    - lambdatemplate.yaml
-    - outputtemplate.yaml
+    - "**/*"
