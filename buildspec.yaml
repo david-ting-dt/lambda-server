@@ -2,21 +2,11 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo Restore started on `date`
-      - cd src/HelloWorld
-      - dotnet clean
-      - dotnet restore
+      - bash ./bin/build.sh
   build:
     commands:
-      - echo Build started on `date`
-      - > 
-        aws cloudformation package 
-        --template-file lambdatemplate.yaml 
-        --s3-bucket "david-ting-dn-lambda-deployment-artifacts"
-        --output-template-file outputtemplate.yaml
-      - cat outputtemplate.yaml
-      - ls -R
+      - bash ./bin/package.sh
 artifacts:
   type: zip
   files:
-    - '**/*'
+    - "**/*"
