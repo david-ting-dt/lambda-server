@@ -10,7 +10,7 @@ Resources:
   HelloWorldDNFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://david-ting-lambda-functions/HelloWorldHandler.zip
+      CodeUri: ./
       Handler: HelloWorld::HelloWorld.HelloWorldHandler::HelloWorld
       Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
       Events:
