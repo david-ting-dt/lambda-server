@@ -1,9 +1,17 @@
 version: 0.2
 phases:
+  install:
+    runtime-versions:
+      dotnet: 3.1
+  pre_build:
+    commands:
+      - echo Restore started on `date`
+      - cd HelloWorld/src/HelloWorld
+      - dotnet clean
+      - dotnet restore
   build:
     commands:
-      - dotnet restore
-      - dotnet build
+      - echo Build started on `date`
       - > 
         aws cloudformation package 
         --template-file lambdatemplate.yaml 
@@ -13,6 +21,6 @@ phases:
 artifacts:
   type: zip
   files:
-    - ./bin/Debug/netcoreapp3.1
+    - ./bin/Debug/netcoreapp3.1/publish
     - lambdatemplate.yaml
     - outputtemplate.yaml
