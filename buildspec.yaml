@@ -1,8 +1,5 @@
 version: 0.2
 phases:
-  install:
-    runtime-versions:
-      dotnet: 3.1
   pre_build:
     commands:
       - echo Restore started on `date`
@@ -22,6 +19,6 @@ phases:
 artifacts:
   type: zip
   files:
-    - src/HelloWorld/bin/Debug/netcoreapp3.1/publish
+    - ./src/HelloWorld/bin/Debug/netcoreapp3.1/publish
     - lambdatemplate.yaml
     - outputtemplate.yaml
