@@ -6,7 +6,7 @@ phases:
   pre_build:
     commands:
       - echo Restore started on `date`
-      - pwd
+      - ls
       - dotnet clean
       - dotnet restore
   build:
