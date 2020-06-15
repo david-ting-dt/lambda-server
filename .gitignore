@@ -122,14 +122,14 @@ $RECYCLE.BIN/
 *.userprefs
 
 # Build results
-[Dd]ebug/
+HelloWorld.Test/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
 x64/
 x86/
 bld/
-[Bb]in/
+#[Bb]in/
 [Oo]bj/
 [Ll]og/
 
