@@ -42,7 +42,17 @@ namespace HelloWorld.Tests
                 }
             };
         }
-        // POST
+        
+        [Fact]
+        public async Task Post_ShouldCallPutObjectAsyncOnce()
+        {
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Post("Key_To_Add");
+            _mockS3Client.Verify(s3 => 
+                s3.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+        
         // DELETE
         // UPDATE
     }
