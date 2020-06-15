@@ -8,19 +8,26 @@ namespace HelloWorld
 {
     public class GetPeopleNamesHandler
     {
-        private readonly IDataStore _dataStore = new S3DataStore();
+        private readonly IDataStore _dataStore;
+
+        public GetPeopleNamesHandler()
+        {
+            _dataStore = new S3DataStore();
+        }
+
+        public GetPeopleNamesHandler(IDataStore dataStore)
+        {
+            _dataStore = dataStore;
+        }
 
         public async Task<APIGatewayProxyResponse> GetPeopleNames()
         {
             var names = await _dataStore.Get();
-            var body = new Dictionary<string, string>
-            {
-                {"names", string.Join(", ", names)}
-            };
+            var body = string.Join(", ", names);
 
             return new APIGatewayProxyResponse
             {
-                Body = JsonConvert.SerializeObject(body),
+                Body = body,
                 StatusCode = 200,
                 Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}}
             };
