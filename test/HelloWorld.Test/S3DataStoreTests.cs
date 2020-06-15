@@ -63,6 +63,18 @@ namespace HelloWorld.Tests
                 Times.Once);
         }
 
-        // UPDATE
+        [Fact]
+        public async Task Put_ShouldCallCopyObjectAsyncAndDeleteObjectAsyncOnce()
+        {
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Put("Old_Key", "New_Key");
+            _mockS3Client.Verify(s3 => 
+                s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+            _mockS3Client.Verify(s3 => 
+                    s3.DeleteObjectAsync(It.IsAny<string>(), It.IsAny<string>(), 
+                        It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
     }
 }
