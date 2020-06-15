@@ -52,8 +52,17 @@ namespace HelloWorld.Tests
                 s3.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()),
                 Times.Once);
         }
-        
-        // DELETE
+
+        [Fact]
+        public async Task Delete_ShouldCallDeleteObjectAsyncOnce()
+        {
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Delete("Key_To_Delete");
+            _mockS3Client.Verify(s3 => 
+                s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
         // UPDATE
     }
 }
