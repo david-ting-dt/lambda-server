@@ -2,10 +2,10 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - bash ./bin/build.sh
+      - bash ./build_commands/build.sh
   build:
     commands:
-      - bash ./bin/package.sh
+      - bash ./build_commands/package.sh
 artifacts:
   type: zip
   files:
