@@ -1,5 +1,5 @@
 #!/bin/bash
 
 echo Build started on `date`
-cp ./src/HelloWorld/bin/Debug/netcoreapp3.1/HelloWorld.deps.json ./
+cp -a ./src/HelloWorld/bin/Debug/netcoreapp3.1/. ./
 aws cloudformation package --template-file lambdatemplate.yaml --s3-bucket "david-ting-dn-lambda-deployment-artifacts" --output-template-file outputtemplate.yaml
