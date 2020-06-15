@@ -14,8 +14,19 @@ namespace HelloWorld
 
     public class HelloWorldHandler
     {
-        private readonly IDataStore _dataStore = new S3DataStore();
-        public async Task<APIGatewayProxyResponse> HelloWorld(APIGatewayProxyRequest request, ILambdaContext context)
+        private readonly IDataStore _dataStore;
+
+        public HelloWorldHandler()
+        {
+            _dataStore = new S3DataStore();
+        }
+
+        public HelloWorldHandler(IDataStore dataStore)
+        {
+            _dataStore = dataStore;
+        }
+
+        public async Task<APIGatewayProxyResponse> HelloWorld()
         {
             var names = await _dataStore.Get();
             var message = GetHelloMessage(string.Join(", ", names));
