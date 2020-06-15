@@ -8,7 +8,17 @@ namespace HelloWorld
 {
     public class AddPersonHandler
     {
-        private readonly IDataStore _dataStore = new S3DataStore();
+        private readonly IDataStore _dataStore;
+
+        public AddPersonHandler()
+        {
+            _dataStore = new S3DataStore();
+        }
+
+        public AddPersonHandler(IDataStore dataStore)
+        {
+            _dataStore = dataStore;
+        }
 
         public async Task<APIGatewayProxyResponse> AddPerson(APIGatewayProxyRequest request)
         {
@@ -21,7 +31,7 @@ namespace HelloWorld
             return new APIGatewayProxyResponse
             {
                 Body = requestBody,
-                StatusCode = (int)response.HttpStatusCode,
+                StatusCode = 200,
                 Headers = new Dictionary<string, string>
                 {
                     {"Content-Type", "application/json"}, 
