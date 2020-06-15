@@ -11,7 +11,17 @@ namespace HelloWorld
     public class S3DataStore : IDataStore
     {
         private const string BucketName = "david-ting-hello-world";
-        private readonly AmazonS3Client _s3Client = new AmazonS3Client();
+        private readonly IAmazonS3 _s3Client;
+
+        public S3DataStore()
+        {
+            _s3Client = new AmazonS3Client();
+        }
+
+        public S3DataStore(IAmazonS3 s3)
+        {
+            _s3Client = s3;
+        }
         
         public async Task<List<string>> Get()
         {
