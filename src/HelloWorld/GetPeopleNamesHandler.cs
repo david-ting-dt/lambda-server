@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
