@@ -38,7 +38,7 @@ namespace HelloWorld.Tests
                 PathParameters = new Dictionary<string, string>{{"name", "Name_to_delete"}}
             };
             var response = await handler.DeletePerson(request);
-            Assert.Equal(200, response.StatusCode);
+            Assert.Equal(204, response.StatusCode);
         }
     }
 }
