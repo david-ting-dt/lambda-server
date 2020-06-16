@@ -5,6 +5,7 @@ phases:
       - bash ./build_commands/build.sh
   build:
     commands:
+      - dotnet test
       - bash ./build_commands/package.sh
 artifacts:
   type: zip
