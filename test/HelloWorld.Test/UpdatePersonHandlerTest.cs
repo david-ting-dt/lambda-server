@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
+using Amazon.S3;
 using HelloWorld.Interfaces;
 using Moq;
 using Newtonsoft.Json;
@@ -27,7 +28,7 @@ namespace HelloWorld.Tests
         }
 
         [Fact]
-        public async Task UpdatePerson_ShouldReturnExpectedResponse()
+        public async Task UpdatePerson_ShouldReturnExpectedResponse_IfUpdateSuccessfully()
         {
             var handler = new UpdatePersonHandler(_mockDataStore.Object);
             var request = CreateMockRequest();
@@ -42,7 +43,24 @@ namespace HelloWorld.Tests
             var expectedJson = JsonConvert.SerializeObject(expected);
             Assert.Equal(expectedJson, responseJson);
         }
+        
+        [Fact]
+        public async Task UpdatePerson_ShouldReturnResponseStatusCode404_IfUpdateFails()
+        {
+            var handler = new UpdatePersonHandler(_mockDataStore.Object);
+            var request = CreateMockRequest();
+            MockFailedDataStoreUpdate();
+            var response = await handler.UpdatePerson(request);
+            Assert.Equal(404, response.StatusCode);
+        }
 
+        private void MockFailedDataStoreUpdate()
+        {
+            _mockDataStore
+                .Setup(d => d.Put("Old_Name", "New_Name"))
+                .Callback(() => throw new AmazonS3Exception("Cannot find 'Old_Name'"));
+        }
+        
         private static APIGatewayProxyRequest CreateMockRequest()
         {
             return new APIGatewayProxyRequest

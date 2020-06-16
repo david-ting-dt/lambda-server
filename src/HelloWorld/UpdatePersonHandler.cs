@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
+using Amazon.S3;
 using HelloWorld.Interfaces;
 
 namespace HelloWorld
@@ -25,9 +24,29 @@ namespace HelloWorld
         {
             var oldKey = request.PathParameters["name"];
             var newKey = request.Body;
-            await _dataStore.Put(oldKey, newKey);
+            try
+            {
+                await _dataStore.Put(oldKey, newKey);
+            }
+            catch (AmazonS3Exception e)
+            {
+                return CreateFailUpdateResponse(oldKey);
+            }
+            return CreateSuccessUpdateResponse(newKey, request.Path);
+        }
 
-            var location = GetNewLocation(newKey, request.Path);
+        private static APIGatewayProxyResponse CreateFailUpdateResponse(string oldKey)
+        {
+            return new APIGatewayProxyResponse
+            {
+                StatusCode = 404,
+                Body = $"Cannot update {oldKey} - Resource not found"
+            };
+        }
+
+        private static APIGatewayProxyResponse CreateSuccessUpdateResponse(string newKey, string path)
+        {
+            var location = GetNewLocation(newKey, path);
             return new APIGatewayProxyResponse
             {
                 StatusCode = 301,
