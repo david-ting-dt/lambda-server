@@ -40,21 +40,5 @@ namespace HelloWorld.Tests
             var response = await handler.DeletePerson(request);
             Assert.Equal(204, response.StatusCode);
         }
-
-        [Fact]
-        public async Task DeletePerson_ShouldReturnResponseStatusCode403_IfDeleteFails()
-        {
-            _mockDataStore
-                .Setup(d => d.Delete("Name_to_delete"))
-                .Callback(() => throw new AmazonS3Exception("fail to delete"));
-            var handler = new DeletePersonHandler(_mockDataStore.Object);
-            var request = new APIGatewayProxyRequest
-            {
-                PathParameters = new Dictionary<string, string> { {"name", "Name_to_delete"} }
-            };
-
-            var response = await handler.DeletePerson(request);
-            Assert.Equal(403, response.StatusCode);
-        }
     }
 }
