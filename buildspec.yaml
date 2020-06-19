@@ -2,10 +2,17 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - bash ./build_commands/$Action/build.sh
+      - mkdir -p ./build_commands/$Action
+      - touch ./build_commands/$Action/pre_build.sh
+      - bash ./build_commands/$Action/pre_build.sh
   build:
     commands:
-      - bash ./build_commands/$Action/package.sh
+      - touch ./build_commands/$Action/build.sh 
+      - bash ./build_commands/$Action/build.sh
+  post_build:
+    commands:
+      - touch ./build_commands/$Action/post_build.sh
+      - bash ./build_commands/$Action/post_build.sh
     
 artifacts:
   type: zip
