@@ -2,11 +2,11 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - bash ./build_commands/build.sh
+      - bash ./build_commands/$Action/build.sh
   build:
     commands:
-      - dotnet test
-      - bash ./build_commands/package.sh
+      - bash ./build_commands/$Action/package.sh
+    
 artifacts:
   type: zip
   files:
