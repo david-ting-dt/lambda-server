@@ -11,8 +11,9 @@ ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
 	buildspec.yaml = buildspec.yaml
 	lambdatemplate.yaml = lambdatemplate.yaml
-	build_commands\build.sh = build_commands\build.sh
-	build_commands\package.sh = build_commands\package.sh
+	build_commands\test\post_build.sh = build_commands\test\post_build.sh
+	build_commands\build\pre_build.sh = build_commands\build\pre_build.sh
+	build_commands\build\build.sh = build_commands\build\build.sh
 EndProjectSection
 EndProject
 Global
