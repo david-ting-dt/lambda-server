@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
@@ -78,6 +79,21 @@ namespace HelloWorld.Tests
             _mockS3Client.Verify(s3 => 
                 s3.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()),
                 Times.Once);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.PreconditionFailed, false)]
+        [InlineData(HttpStatusCode.Accepted, true)]
+        public async Task DoETagsMatch_ShouldReturnCorrectBooleanAsExpected(HttpStatusCode statusCode, bool expected)
+        {
+            _mockS3Client.Setup(s3 =>
+                    s3.GetObjectAsync(It.IsAny<GetObjectRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetObjectResponse { HttpStatusCode = statusCode });
+            
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            var result = await s3DataStore.DoETagsMatch("mock_key", "mock_ETag");
+            
+            Assert.Equal(expected, result);
         }
     }
 }

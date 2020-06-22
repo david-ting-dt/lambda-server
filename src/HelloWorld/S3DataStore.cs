@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -70,6 +72,19 @@ namespace HelloWorld
             await _s3Client.CopyObjectAsync(copyObjectRequest);
             await _s3Client.DeleteObjectAsync(BucketName, oldKey);
             return await _s3Client.PutObjectAsync(putObjectRequest);
+        }
+
+
+        public async Task<bool> DoETagsMatch(string key, string requestETag)
+        {
+            var request = new GetObjectRequest
+            {
+                BucketName = BucketName,
+                Key = key,
+                EtagToMatch = requestETag
+            };
+            var response = await _s3Client.GetObjectAsync(request);
+            return response.HttpStatusCode == HttpStatusCode.Accepted;
         }
     }
 }
