@@ -36,6 +36,7 @@ namespace HelloWorld
             {
                 BucketName = BucketName,
                 Key = key,
+                ContentBody = key
             };
             return await _s3Client.PutObjectAsync(request);
         }
