@@ -39,7 +39,7 @@ namespace HelloWorld.Tests
             var expected = new APIGatewayProxyResponse
             {
                 StatusCode = 301,
-                Headers = new Dictionary<string, string> { {"Location", "/people/New_Name"}, {"Etag", "fake_etag"} }
+                Headers = new Dictionary<string, string> { {"Location", "/people/New_Name"}, {"ETag", "fake_etag"} }
             };
 
             var responseJson = JsonConvert.SerializeObject(response);
