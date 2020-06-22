@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
+using Amazon.S3.Model;
 using HelloWorld.Interfaces;
 using Moq;
 using Xunit;
@@ -22,6 +23,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task AddPerson_ShouldCallDataStorePostMethodOnce_IfPersonNotAlreadyExist()
         {
+            MockDataStorePutMethod();
             var handler = new AddPersonHandler(_mockDataStore.Object);
             var request = new APIGatewayProxyRequest { Body = "Name_to_add" };
             await handler.AddPerson(request);
@@ -31,10 +33,17 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task AddPerson_ShouldReturnResponseStatusCode200_IfPersonNotAlreadyExit()
         {
+            MockDataStorePutMethod();
             var handler = new AddPersonHandler(_mockDataStore.Object);
             var request = new APIGatewayProxyRequest { Body = "Name_to_add" };
             var response = await handler.AddPerson(request);
             Assert.Equal(200, response.StatusCode);
+        }
+        
+        private void MockDataStorePutMethod()
+        {
+            _mockDataStore.Setup(s3 => s3.Post(It.IsAny<string>()))
+                .ReturnsAsync(new PutObjectResponse {ETag = "fake_etag"});
         }
 
         [Fact]
