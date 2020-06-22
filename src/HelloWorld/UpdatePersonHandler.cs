@@ -26,13 +26,13 @@ namespace HelloWorld
             var newKey = request.Body;
             try
             {
-                await _dataStore.Put(oldKey, newKey);
+                var response = await _dataStore.Put(oldKey, newKey);
+                return CreateSuccessUpdateResponse(newKey, request.Path, response.ETag);
             }
             catch (AmazonS3Exception e)
             {
                 return CreateFailUpdateResponse(oldKey);
             }
-            return CreateSuccessUpdateResponse(newKey, request.Path);
         }
 
         private static APIGatewayProxyResponse CreateFailUpdateResponse(string oldKey)
@@ -44,13 +44,17 @@ namespace HelloWorld
             };
         }
 
-        private static APIGatewayProxyResponse CreateSuccessUpdateResponse(string newKey, string path)
+        private static APIGatewayProxyResponse CreateSuccessUpdateResponse(string newKey, string path, string etag)
         {
             var location = GetNewLocation(newKey, path);
             return new APIGatewayProxyResponse
             {
                 StatusCode = 301,
-                Headers = new Dictionary<string, string> {{"Location", location}}
+                Headers = new Dictionary<string, string>
+                {
+                    {"Location", location},
+                    {"Etag", etag}
+                }
             };
         }
 

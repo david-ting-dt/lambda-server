@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.S3;
+using Amazon.S3.Model;
 using HelloWorld.Interfaces;
 using Moq;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ namespace HelloWorld.Tests
         public async Task UpdatePerson_ShouldCallDataStorePutMethodOnce()
         {
             var handler = new UpdatePersonHandler(_mockDataStore.Object);
+            MockDataStorePutMethod();
             var request = CreateMockRequest();
             await handler.UpdatePerson(request);
             _mockDataStore.Verify(d => d.Put("Old_Name", "New_Name"), Times.Once);
@@ -31,17 +33,24 @@ namespace HelloWorld.Tests
         public async Task UpdatePerson_ShouldReturnExpectedResponse_IfUpdateSuccessfully()
         {
             var handler = new UpdatePersonHandler(_mockDataStore.Object);
+            MockDataStorePutMethod();
             var request = CreateMockRequest();
             var response = await handler.UpdatePerson(request);
             var expected = new APIGatewayProxyResponse
             {
                 StatusCode = 301,
-                Headers = new Dictionary<string, string> { {"Location", "/people/New_Name"} }
+                Headers = new Dictionary<string, string> { {"Location", "/people/New_Name"}, {"Etag", "fake_etag"} }
             };
 
             var responseJson = JsonConvert.SerializeObject(response);
             var expectedJson = JsonConvert.SerializeObject(expected);
             Assert.Equal(expectedJson, responseJson);
+        }
+
+        private void MockDataStorePutMethod()
+        {
+            _mockDataStore.Setup(s3 => s3.Put(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new PutObjectResponse {ETag = "fake_etag"});
         }
         
         [Fact]
