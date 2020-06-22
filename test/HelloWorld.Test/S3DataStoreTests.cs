@@ -75,6 +75,9 @@ namespace HelloWorld.Tests
                     s3.DeleteObjectAsync(It.IsAny<string>(), It.IsAny<string>(), 
                         It.IsAny<CancellationToken>()),
                 Times.Once);
+            _mockS3Client.Verify(s3 => 
+                s3.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once);
         }
     }
 }

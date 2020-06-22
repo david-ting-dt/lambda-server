@@ -10,6 +10,6 @@ namespace HelloWorld.Interfaces
         public Task<List<string>> Get();
         public Task<PutObjectResponse> Post(string key);
         public Task Delete(string key);
-        public Task Put(string oldKey, string newKey);
+        public Task<PutObjectResponse> Put(string oldKey, string newKey);
     }
 }
