@@ -36,7 +36,7 @@ namespace HelloWorld
                 {
                     {"Content-Type", "application/json"}, 
                     {"Location", $"{request.Path}/{requestBody}"},
-                    {"ETag", $"{response.ETag}"}
+                    {"ETag", response.ETag.Replace("\"", "")}
                 }
             };
         }

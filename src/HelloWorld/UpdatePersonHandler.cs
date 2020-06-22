@@ -53,7 +53,7 @@ namespace HelloWorld
                 Headers = new Dictionary<string, string>
                 {
                     {"Location", location},
-                    {"ETag", etag}
+                    {"ETag", etag.Replace("\"", "")}
                 }
             };
         }
