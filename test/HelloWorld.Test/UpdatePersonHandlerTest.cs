@@ -26,7 +26,7 @@ namespace HelloWorld.Tests
             MockDataStorePutMethod();
             var request = CreateMockRequest();
             await handler.UpdatePerson(request);
-            _mockDataStore.Verify(d => d.Put("Old_Name", "New_Name"), Times.Once);
+            _mockDataStore.Verify(d => d.Put("Old_Name", "New_Name", It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace HelloWorld.Tests
 
         private void MockDataStorePutMethod()
         {
-            _mockDataStore.Setup(s3 => s3.Put(It.IsAny<string>(), It.IsAny<string>()))
+            _mockDataStore.Setup(s3 => s3.Put(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new PutObjectResponse {ETag = "fake_etag"});
         }
         
@@ -66,7 +66,7 @@ namespace HelloWorld.Tests
         private void MockFailedDataStoreUpdate()
         {
             _mockDataStore
-                .Setup(d => d.Put("Old_Name", "New_Name"))
+                .Setup(d => d.Put("Old_Name", "New_Name", It.IsAny<string>()))
                 .Callback(() => throw new AmazonS3Exception("Cannot find 'Old_Name'"));
         }
         

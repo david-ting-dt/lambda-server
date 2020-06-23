@@ -12,10 +12,18 @@ namespace HelloWorld.Tests
     public class S3DataStoreTests
     {
         private readonly Mock<IAmazonS3> _mockS3Client;
-        
+        private readonly List<S3Object> _mockS3Objects;
+        private const string BucketName = "david-ting-hello-world";
+
         public S3DataStoreTests()
         {
             _mockS3Client = new Mock<IAmazonS3>();
+            _mockS3Objects = new List<S3Object>
+            {
+                new S3Object{BucketName = BucketName, ETag = "ETag1", Key = "Person1"},
+                new S3Object{BucketName = BucketName, ETag = "ETag2", Key = "Person2"},
+                new S3Object{BucketName = BucketName, ETag = "ETag3", Key = "Person3"}
+            };
         }
         
         [Fact]
@@ -65,37 +73,20 @@ namespace HelloWorld.Tests
         }
 
         [Fact]
-        public async Task Put_ShouldCallCopyObjectAsyncAndDeleteObjectAsyncOnce()
+        public async Task Put_ShouldCallCopyObjectAsyncOnce_IfNoRequestETagIsProvided()
         {
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.Put("Old_Key", "New_Key");
-            _mockS3Client.Verify(s3 => 
-                s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), It.IsAny<CancellationToken>()),
-                Times.Once);
-            _mockS3Client.Verify(s3 => 
-                    s3.DeleteObjectAsync(It.IsAny<string>(), It.IsAny<string>(), 
-                        It.IsAny<CancellationToken>()),
-                Times.Once);
-            _mockS3Client.Verify(s3 => 
-                s3.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()),
-                Times.Once);
-        }
-
-        [Fact]
-        public async Task Update_ShouldCallCopyObjectAsyncOnce_IfNoRequestETagIsProvided()
-        {
-            var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.Update("old_key", "new_key");
+            await s3DataStore.Put("old_key", "new_key");
             _mockS3Client.Verify(s3 => 
                 s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), It.IsAny<CancellationToken>())
                 , Times.Once);
         }
         
         [Fact]
-        public async Task Update_ShouldCallDeleteObjectAsyncOnce_IfNoRequestETagIsProvided()
+        public async Task Put_ShouldCallDeleteObjectAsyncOnce_IfNoRequestETagIsProvided()
         {
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.Update("old_key", "new_key");
+            await s3DataStore.Put("old_key", "new_key");
             _mockS3Client.Verify(s3 => 
                     s3.DeleteObjectAsync(It.IsAny<string>(), It.IsAny<string>(), 
                         It.IsAny<CancellationToken>())
@@ -103,44 +94,44 @@ namespace HelloWorld.Tests
         }
         
         [Fact]
-        public async Task Update_ShouldCallPutObjectAsyncOnce_IfNoRequestETagIsProvided()
+        public async Task Put_ShouldCallPutObjectAsyncOnce_IfNoRequestETagIsProvided()
         {
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.Update("old_key", "new_key");
+            await s3DataStore.Put("old_key", "new_key");
             _mockS3Client.Verify(s3 => 
                     s3.PutObjectAsync(It.IsAny<PutObjectRequest>(),It.IsAny<CancellationToken>())
                 , Times.Once);
         }
 
         [Fact]
-        public async Task Update_ShouldReturnResponseWithStatusCode412_IfETagsNotMatched()
+        public async Task Put_ShouldReturnResponseWithStatusCode412_IfETagsNotMatched()
         {
             _mockS3Client.Setup(s3 => s3.GetObjectAsync(It.IsAny<GetObjectRequest>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetObjectResponse {HttpStatusCode = HttpStatusCode.PreconditionFailed});
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            var response = await s3DataStore.Update("old_key", "new_key", "etag_that_doesnt_match");
+            var response = await s3DataStore.Put("old_key", "new_key", "etag_that_doesnt_match");
             var result = (int) response.HttpStatusCode;
             Assert.Equal(412, result);
         }
 
         [Fact]
-        public async Task Update_ShouldCallCopyObjectAsyncOnce_IfETagsMatched()
+        public async Task Put_ShouldCallCopyObjectAsyncOnce_IfETagsMatched()
         {
             MockMatchingETagResponse();
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.Update("old_key", "new_key", "etag_that_matches");
+            await s3DataStore.Put("old_key", "new_key", "etag_that_matches");
             _mockS3Client.Verify(s3 => 
                 s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
         [Fact]
-        public async Task Update_ShouldCallDeleteObjectAsyncOnce_IfETagsMatched()
+        public async Task Put_ShouldCallDeleteObjectAsyncOnce_IfETagsMatched()
         {
             MockMatchingETagResponse();
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.Update("old_key", "new_key", "etag_that_matches");
+            await s3DataStore.Put("old_key", "new_key", "etag_that_matches");
             _mockS3Client.Verify(s3 => 
                     s3.DeleteObjectAsync(It.IsAny<string>(), It.IsAny<string>(), 
                         It.IsAny<CancellationToken>()),
@@ -148,11 +139,11 @@ namespace HelloWorld.Tests
         }
         
         [Fact]
-        public async Task Update_ShouldCallPutObjectAsyncOnce_IfETagsMatched()
+        public async Task Put_ShouldCallPutObjectAsyncOnce_IfETagsMatched()
         {
             MockMatchingETagResponse();
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.Update("old_key", "new_key", "etag_that_matches");
+            await s3DataStore.Put("old_key", "new_key", "etag_that_matches");
             _mockS3Client.Verify(s3 => 
                     s3.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()),
                 Times.Once);

@@ -52,28 +52,7 @@ namespace HelloWorld
             await _s3Client.DeleteObjectAsync(request);
         }
 
-        public async Task<PutObjectResponse> Put(string oldKey, string newKey)
-        {
-            var copyObjectRequest = new CopyObjectRequest
-            {
-                SourceBucket = BucketName,
-                DestinationBucket = BucketName,
-                SourceKey = oldKey,
-                DestinationKey = newKey
-            };
-            var putObjectRequest = new PutObjectRequest
-            {
-                BucketName = BucketName,
-                Key = newKey,
-                ContentBody = newKey
-            };
-
-            await _s3Client.CopyObjectAsync(copyObjectRequest);
-            await _s3Client.DeleteObjectAsync(BucketName, oldKey);
-            return await _s3Client.PutObjectAsync(putObjectRequest);
-        }
-
-        public async Task<PutObjectResponse> Update(string oldKey, string newKey, string requestETag = "")
+        public async Task<PutObjectResponse> Put(string oldKey, string newKey, string requestETag = "")
         {
             if (requestETag == "") return await UpdateObject(oldKey, newKey);
             var areETagsMatching = await CompareETags(oldKey, requestETag);
