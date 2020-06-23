@@ -12,18 +12,10 @@ namespace HelloWorld.Tests
     public class S3DataStoreTests
     {
         private readonly Mock<IAmazonS3> _mockS3Client;
-        private readonly List<S3Object> _mockS3Objects;
-        private const string BucketName = "david-ting-hello-world";
 
         public S3DataStoreTests()
         {
             _mockS3Client = new Mock<IAmazonS3>();
-            _mockS3Objects = new List<S3Object>
-            {
-                new S3Object{BucketName = BucketName, ETag = "ETag1", Key = "Person1"},
-                new S3Object{BucketName = BucketName, ETag = "ETag2", Key = "Person2"},
-                new S3Object{BucketName = BucketName, ETag = "ETag3", Key = "Person3"}
-            };
         }
         
         [Fact]
