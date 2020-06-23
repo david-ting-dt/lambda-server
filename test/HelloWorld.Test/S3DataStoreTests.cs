@@ -81,19 +81,88 @@ namespace HelloWorld.Tests
                 Times.Once);
         }
 
-        [Theory]
-        [InlineData(HttpStatusCode.PreconditionFailed, false)]
-        [InlineData(HttpStatusCode.Accepted, true)]
-        public async Task DoETagsMatch_ShouldReturnCorrectBooleanAsExpected(HttpStatusCode statusCode, bool expected)
+        [Fact]
+        public async Task Update_ShouldCallCopyObjectAsyncOnce_IfNoRequestETagIsProvided()
         {
-            _mockS3Client.Setup(s3 =>
-                    s3.GetObjectAsync(It.IsAny<GetObjectRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetObjectResponse { HttpStatusCode = statusCode });
-            
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            var result = await s3DataStore.DoETagsMatch("mock_key", "mock_ETag");
-            
-            Assert.Equal(expected, result);
+            await s3DataStore.Update("old_key", "new_key");
+            _mockS3Client.Verify(s3 => 
+                s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), It.IsAny<CancellationToken>())
+                , Times.Once);
+        }
+        
+        [Fact]
+        public async Task Update_ShouldCallDeleteObjectAsyncOnce_IfNoRequestETagIsProvided()
+        {
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Update("old_key", "new_key");
+            _mockS3Client.Verify(s3 => 
+                    s3.DeleteObjectAsync(It.IsAny<string>(), It.IsAny<string>(), 
+                        It.IsAny<CancellationToken>())
+                , Times.Once);
+        }
+        
+        [Fact]
+        public async Task Update_ShouldCallPutObjectAsyncOnce_IfNoRequestETagIsProvided()
+        {
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Update("old_key", "new_key");
+            _mockS3Client.Verify(s3 => 
+                    s3.PutObjectAsync(It.IsAny<PutObjectRequest>(),It.IsAny<CancellationToken>())
+                , Times.Once);
+        }
+
+        [Fact]
+        public async Task Update_ShouldReturnResponseWithStatusCode412_IfETagsNotMatched()
+        {
+            _mockS3Client.Setup(s3 => s3.GetObjectAsync(It.IsAny<GetObjectRequest>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetObjectResponse {HttpStatusCode = HttpStatusCode.PreconditionFailed});
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            var response = await s3DataStore.Update("old_key", "new_key", "etag_that_doesnt_match");
+            var result = (int) response.HttpStatusCode;
+            Assert.Equal(412, result);
+        }
+
+        [Fact]
+        public async Task Update_ShouldCallCopyObjectAsyncOnce_IfETagsMatched()
+        {
+            MockMatchingETagResponse();
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Update("old_key", "new_key", "etag_that_matches");
+            _mockS3Client.Verify(s3 => 
+                s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Update_ShouldCallDeleteObjectAsyncOnce_IfETagsMatched()
+        {
+            MockMatchingETagResponse();
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Update("old_key", "new_key", "etag_that_matches");
+            _mockS3Client.Verify(s3 => 
+                    s3.DeleteObjectAsync(It.IsAny<string>(), It.IsAny<string>(), 
+                        It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+        
+        [Fact]
+        public async Task Update_ShouldCallPutObjectAsyncOnce_IfETagsMatched()
+        {
+            MockMatchingETagResponse();
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Update("old_key", "new_key", "etag_that_matches");
+            _mockS3Client.Verify(s3 => 
+                    s3.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        private void MockMatchingETagResponse()
+        {
+            _mockS3Client.Setup(s3 => s3.GetObjectAsync(It.IsAny<GetObjectRequest>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetObjectResponse {HttpStatusCode = HttpStatusCode.Accepted});
         }
     }
 }

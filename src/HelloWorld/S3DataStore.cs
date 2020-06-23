@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -74,8 +73,38 @@ namespace HelloWorld
             return await _s3Client.PutObjectAsync(putObjectRequest);
         }
 
+        public async Task<PutObjectResponse> Update(string oldKey, string newKey, string requestETag = "")
+        {
+            if (requestETag == "") return await UpdateObject(oldKey, newKey);
+            var areETagsMatching = await CompareETags(oldKey, requestETag);
+            if (!areETagsMatching)
+                return new PutObjectResponse {HttpStatusCode = HttpStatusCode.PreconditionFailed};
+            return await UpdateObject(oldKey, newKey);
+        }
 
-        public async Task<bool> DoETagsMatch(string key, string requestETag)
+        private async Task<PutObjectResponse> UpdateObject(string oldKey, string newKey)
+        {
+            var copyObjectRequest = new CopyObjectRequest
+            {
+                SourceBucket = BucketName,
+                DestinationBucket = BucketName,
+                SourceKey = oldKey,
+                DestinationKey = newKey
+            };
+            var putObjectRequest = new PutObjectRequest
+            {
+                BucketName = BucketName,
+                Key = newKey,
+                ContentBody = newKey
+            };
+
+            await _s3Client.CopyObjectAsync(copyObjectRequest);
+            await _s3Client.DeleteObjectAsync(BucketName, oldKey);
+            return await _s3Client.PutObjectAsync(putObjectRequest);
+        }
+
+
+        private async Task<bool> CompareETags(string key, string requestETag)
         {
             var request = new GetObjectRequest
             {
