@@ -58,7 +58,7 @@ namespace HelloWorld.Tests
         public async Task Delete_ShouldCallDeleteObjectAsyncOnce_IfNoRequestETagIsProvided()
         {
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.NewDelete("Key_To_Delete");
+            await s3DataStore.Delete("Key_To_Delete");
             _mockS3Client.Verify(s3 => 
                 s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), It.IsAny<CancellationToken>()),
                 Times.Once);
@@ -69,7 +69,7 @@ namespace HelloWorld.Tests
         {
             MockETagCompareResponse(HttpStatusCode.Accepted);
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.NewDelete("Key_To_Delete", "matching_ETag");
+            await s3DataStore.Delete("Key_To_Delete", "matching_ETag");
             
             _mockS3Client.Verify(s3 => 
                 s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), It.IsAny<CancellationToken>()),
@@ -81,7 +81,7 @@ namespace HelloWorld.Tests
         {
             MockETagCompareResponse(HttpStatusCode.PreconditionFailed);
             var s3DatStore = new S3DataStore(_mockS3Client.Object);
-            var response = await s3DatStore.NewDelete("Key_To_Delete", "non-matching_ETag");
+            var response = await s3DatStore.Delete("Key_To_Delete", "non-matching_ETag");
             var result = (int) response.HttpStatusCode;
             Assert.Equal(412, result);
         }

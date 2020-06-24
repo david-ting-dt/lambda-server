@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
-using Amazon.S3;
 using HelloWorld.Interfaces;
 using Moq;
 using Xunit;
@@ -26,7 +25,7 @@ namespace HelloWorld.Tests
                 PathParameters = new Dictionary<string, string>{{"name", "Name_to_delete"}}
             };
             await handler.DeletePerson(request);
-            _mockDataStore.Verify(d => d.Delete("Name_to_delete"), Times.Once);
+            _mockDataStore.Verify(d => d.Delete("Name_to_delete", It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
