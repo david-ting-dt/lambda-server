@@ -81,9 +81,20 @@ namespace HelloWorld.Tests
         {
             MockETagCompareResponse(HttpStatusCode.PreconditionFailed);
             var s3DatStore = new S3DataStore(_mockS3Client.Object);
-            var response = await s3DatStore.Delete("Key_To_Delete", "non-matching_ETag");
+            var response = await s3DatStore.Delete("Key_To_Delete", "ETag_that_doesnt_match");
             var result = (int) response.HttpStatusCode;
             Assert.Equal(412, result);
+        }
+
+        [Fact]
+        public async Task Delete_ShouldNotCallDeleteObjectAsync_IfETagsDontMatch()
+        {
+            MockETagCompareResponse(HttpStatusCode.PreconditionFailed);
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Delete("Key_To_Delete", "ETag_that_doesnt_match");
+            _mockS3Client.Verify(s3 => s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), 
+                It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         [Fact]
@@ -125,6 +136,39 @@ namespace HelloWorld.Tests
             var response = await s3DataStore.Put("old_key", "new_key", "etag_that_doesnt_match");
             var result = (int) response.HttpStatusCode;
             Assert.Equal(412, result);
+        }
+
+        [Fact]
+        public async Task Put_ShouldNotCallCopyObjectAsync_IfETagsNotMatched()
+        {
+            MockETagCompareResponse(HttpStatusCode.PreconditionFailed);
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Put("old_key", "new_key", "etag_that_doesnt_match");
+            _mockS3Client.Verify(s3 => s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), 
+                    It.IsAny<CancellationToken>()), 
+                Times.Never);
+        }
+        
+        [Fact]
+        public async Task Put_ShouldNotCallDeleteObjectAsync_IfETagsNotMatched()
+        {
+            MockETagCompareResponse(HttpStatusCode.PreconditionFailed);
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Put("old_key", "new_key", "etag_that_doesnt_match");
+            _mockS3Client.Verify(s3 => s3.DeleteObjectAsync(It.IsAny<string>(), "old_key", 
+                It.IsAny<CancellationToken>()), 
+                Times.Never);
+        }
+        
+        [Fact]
+        public async Task Put_ShouldNotCallPutObjectAsync_IfETagsNotMatched()
+        {
+            MockETagCompareResponse(HttpStatusCode.PreconditionFailed);
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.Put("old_key", "new_key", "etag_that_doesnt_match");
+            _mockS3Client.Verify(s3 => s3.PutObjectAsync(It.IsAny<PutObjectRequest>(), 
+                    It.IsAny<CancellationToken>()), 
+                Times.Never);
         }
 
         [Fact]
