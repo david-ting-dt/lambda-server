@@ -55,13 +55,35 @@ namespace HelloWorld.Tests
         }
 
         [Fact]
-        public async Task Delete_ShouldCallDeleteObjectAsyncOnce()
+        public async Task Delete_ShouldCallDeleteObjectAsyncOnce_IfNoRequestETagIsProvided()
         {
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
-            await s3DataStore.Delete("Key_To_Delete");
+            await s3DataStore.NewDelete("Key_To_Delete");
             _mockS3Client.Verify(s3 => 
                 s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), It.IsAny<CancellationToken>()),
                 Times.Once);
+        }
+
+        [Fact]
+        public async Task Delete_ShouldCallDeleteObjectAsyncOnce_IfRequestETagsMatched()
+        {
+            MockETagCompareResponse(HttpStatusCode.Accepted);
+            var s3DataStore = new S3DataStore(_mockS3Client.Object);
+            await s3DataStore.NewDelete("Key_To_Delete", "matching_ETag");
+            
+            _mockS3Client.Verify(s3 => 
+                s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Delete_ShouldReturnResponseCode412_IfETagsDontMatch()
+        {
+            MockETagCompareResponse(HttpStatusCode.PreconditionFailed);
+            var s3DatStore = new S3DataStore(_mockS3Client.Object);
+            var response = await s3DatStore.NewDelete("Key_To_Delete", "non-matching_ETag");
+            var result = (int) response.HttpStatusCode;
+            Assert.Equal(412, result);
         }
 
         [Fact]
@@ -98,9 +120,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task Put_ShouldReturnResponseWithStatusCode412_IfETagsNotMatched()
         {
-            _mockS3Client.Setup(s3 => s3.GetObjectAsync(It.IsAny<GetObjectRequest>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetObjectResponse {HttpStatusCode = HttpStatusCode.PreconditionFailed});
+            MockETagCompareResponse(HttpStatusCode.PreconditionFailed);
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
             var response = await s3DataStore.Put("old_key", "new_key", "etag_that_doesnt_match");
             var result = (int) response.HttpStatusCode;
@@ -110,7 +130,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task Put_ShouldCallCopyObjectAsyncOnce_IfETagsMatched()
         {
-            MockMatchingETagResponse();
+            MockETagCompareResponse(HttpStatusCode.Accepted);
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
             await s3DataStore.Put("old_key", "new_key", "etag_that_matches");
             _mockS3Client.Verify(s3 => 
@@ -121,7 +141,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task Put_ShouldCallDeleteObjectAsyncOnce_IfETagsMatched()
         {
-            MockMatchingETagResponse();
+            MockETagCompareResponse(HttpStatusCode.Accepted);
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
             await s3DataStore.Put("old_key", "new_key", "etag_that_matches");
             _mockS3Client.Verify(s3 => 
@@ -133,7 +153,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task Put_ShouldCallPutObjectAsyncOnce_IfETagsMatched()
         {
-            MockMatchingETagResponse();
+            MockETagCompareResponse(HttpStatusCode.Accepted);
             var s3DataStore = new S3DataStore(_mockS3Client.Object);
             await s3DataStore.Put("old_key", "new_key", "etag_that_matches");
             _mockS3Client.Verify(s3 => 
@@ -141,11 +161,11 @@ namespace HelloWorld.Tests
                 Times.Once);
         }
 
-        private void MockMatchingETagResponse()
+        private void MockETagCompareResponse(HttpStatusCode statusCode)
         {
             _mockS3Client.Setup(s3 => s3.GetObjectAsync(It.IsAny<GetObjectRequest>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetObjectResponse {HttpStatusCode = HttpStatusCode.Accepted});
+                .ReturnsAsync(new GetObjectResponse {HttpStatusCode = statusCode});
         }
     }
 }

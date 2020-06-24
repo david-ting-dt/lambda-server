@@ -52,13 +52,33 @@ namespace HelloWorld
             await _s3Client.DeleteObjectAsync(request);
         }
 
+        public async Task<DeleteObjectResponse> NewDelete(string key, string requestETag = "")
+        {
+            if (requestETag == "")
+                return await DeleteObject(key);
+            var areETagsMatching = await CompareETags(key, requestETag);
+            return areETagsMatching
+                ? await DeleteObject(key)
+                : new DeleteObjectResponse {HttpStatusCode = HttpStatusCode.PreconditionFailed};
+        }
+
+        private async Task<DeleteObjectResponse> DeleteObject(string key)
+        {
+            var request = new DeleteObjectRequest
+            {
+                BucketName = BucketName,
+                Key = key
+            };
+            return await _s3Client.DeleteObjectAsync(request);
+        }
+
         public async Task<PutObjectResponse> Put(string oldKey, string newKey, string requestETag = "")
         {
             if (requestETag == "") return await UpdateObject(oldKey, newKey);
             var areETagsMatching = await CompareETags(oldKey, requestETag);
-            if (!areETagsMatching)
-                return new PutObjectResponse {HttpStatusCode = HttpStatusCode.PreconditionFailed};
-            return await UpdateObject(oldKey, newKey);
+            return areETagsMatching 
+                ? await UpdateObject(oldKey, newKey) 
+                : new PutObjectResponse {HttpStatusCode = HttpStatusCode.PreconditionFailed};
         }
 
         private async Task<PutObjectResponse> UpdateObject(string oldKey, string newKey)
