@@ -24,12 +24,14 @@ namespace HelloWorld
         {
             var oldKey = request.PathParameters["name"];
             var newKey = request.Body;
+            var requestETag = request.Headers != null && request.Headers.ContainsKey("If-Match") ? 
+                request.Headers["If-Match"] : "";
             try
             {
-                var response = await _dataStore.Put(oldKey, newKey);
+                var response = await _dataStore.Put(oldKey, newKey, requestETag);
                 return CreateSuccessUpdateResponse(newKey, request.Path, response.ETag);
             }
-            catch (AmazonS3Exception e)
+            catch (AmazonS3Exception)
             {
                 return CreateFailUpdateResponse(oldKey);
             }

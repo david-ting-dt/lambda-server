@@ -76,7 +76,8 @@ namespace HelloWorld.Tests
             {
                 PathParameters = new Dictionary<string, string> { {"name", "Old_Name"} },
                 Body = "New_Name",
-                Path = "/people/Old_Name"
+                Path = "/people/Old_Name",
+                Headers = null
             };
         }
     }
