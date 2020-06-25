@@ -40,28 +40,39 @@ namespace HelloWorld.Tests
             Assert.Equal(200, response.StatusCode);
         }
         
+        [Fact]
+        public async Task AddPerson_ShouldReturnResponseStatusCode400_IfRequestBodyIsNotValid()
+        {
+            MockDataStorePutMethod();
+            var handler = new AddPersonHandler(_mockDataStore.Object);
+            var request = new APIGatewayProxyRequest { Body = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+            var response = await handler.AddPerson(request);
+            Assert.Equal(400, response.StatusCode);
+        }
+        
         private void MockDataStorePutMethod()
         {
             _mockDataStore.Setup(s3 => s3.Post(It.IsAny<string>()))
                 .ReturnsAsync(new PutObjectResponse {ETag = "fake_etag"});
         }
 
-        [Fact]
-        public async Task AddPerson_ShouldNotCallDataStorePostMethod_IfPersonAlreadyExist()
-        {
-            var handler = new AddPersonHandler(_mockDataStore.Object);
-            var request = new APIGatewayProxyRequest { Body = "David" };
-            await handler.AddPerson(request);
-            _mockDataStore.Verify(d => d.Post(request.Body), Times.Never);
-        }
 
-        [Fact]
-        public async Task AddPerson_ShouldReturnResponseStatusCode202_IfPersonAlreadyExists()
-        {
-            var handler = new AddPersonHandler(_mockDataStore.Object);
-            var request = new APIGatewayProxyRequest{ Body = "David" };
-            var response = await handler.AddPerson(request);
-            Assert.Equal(202, response.StatusCode);
-        }
+        // [Fact]
+        // public async Task AddPerson_ShouldNotCallDataStorePostMethod_IfPersonAlreadyExist()
+        // {
+        //     var handler = new AddPersonHandler(_mockDataStore.Object);
+        //     var request = new APIGatewayProxyRequest { Body = "David" };
+        //     await handler.AddPerson(request);
+        //     _mockDataStore.Verify(d => d.Post(request.Body), Times.Never);
+        // }
+        //
+        // [Fact]
+        // public async Task AddPerson_ShouldReturnResponseStatusCode202_IfPersonAlreadyExists()
+        // {
+        //     var handler = new AddPersonHandler(_mockDataStore.Object);
+        //     var request = new APIGatewayProxyRequest{ Body = "David" };
+        //     var response = await handler.AddPerson(request);
+        //     Assert.Equal(202, response.StatusCode);
+        // }
     }
 }
