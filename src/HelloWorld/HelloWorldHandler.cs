@@ -26,6 +26,19 @@ namespace HelloWorld
 
         public async Task<APIGatewayProxyResponse> HelloWorld()
         {
+            try
+            {
+                return await CreateResponse();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return DefaultServerResponse.CreateServerErrorResponse();
+            }
+        }
+
+        private async Task<APIGatewayProxyResponse> CreateResponse()
+        {
             var names = await _dataStore.Get();
             var message = GetHelloMessage(string.Join(", ", names));
 

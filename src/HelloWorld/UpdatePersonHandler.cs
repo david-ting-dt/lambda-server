@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
@@ -25,6 +26,19 @@ namespace HelloWorld
 
         public async Task<APIGatewayProxyResponse> UpdatePerson(APIGatewayProxyRequest request)
         {
+            try
+            {
+                return await CreateResponse(request);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return DefaultServerResponse.CreateServerErrorResponse();
+            }
+        }
+
+        private async Task<APIGatewayProxyResponse> CreateResponse(APIGatewayProxyRequest request)
+        {
             var oldName = request.PathParameters["name"];
             var newName = request.Body;
             var requestETag = request.Headers != null && request.Headers.ContainsKey("If-Match") ? 
@@ -39,7 +53,7 @@ namespace HelloWorld
                 return CreateFailUpdateResponse(oldName);
             }
         }
-
+        
         private static APIGatewayProxyResponse CreateFailUpdateResponse(string oldName)
         {
             return new APIGatewayProxyResponse

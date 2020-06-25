@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
@@ -21,6 +22,19 @@ namespace HelloWorld
         }
 
         public async Task<APIGatewayProxyResponse> GetPeopleNames()
+        {
+            try
+            {
+                return await CreateResponse();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return DefaultServerResponse.CreateServerErrorResponse();
+            }
+        }
+
+        private async Task<APIGatewayProxyResponse> CreateResponse()
         {
             var names = await _dataStore.Get();
             var body = string.Join(", ", names);

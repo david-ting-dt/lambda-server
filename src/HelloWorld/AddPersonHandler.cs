@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +22,19 @@ namespace HelloWorld
         }
 
         public async Task<APIGatewayProxyResponse> AddPerson(APIGatewayProxyRequest request)
+        {
+            try
+            {
+                return await CreateSuccessfulAddResponse(request);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e); 
+                return DefaultServerResponse.CreateServerErrorResponse();
+            }
+        }
+
+        private async Task<APIGatewayProxyResponse> CreateSuccessfulAddResponse(APIGatewayProxyRequest request)
         {
             var names = await _dataStore.Get();
             var requestBody = request.Body;
