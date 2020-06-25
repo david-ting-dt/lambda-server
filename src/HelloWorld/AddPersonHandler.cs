@@ -25,7 +25,7 @@ namespace HelloWorld
         {
             try
             {
-                return await CreateSuccessfulAddResponse(request);
+                return await CreateResponse(request);
             }
             catch (Exception e)
             {
@@ -34,13 +34,13 @@ namespace HelloWorld
             }
         }
 
-        private async Task<APIGatewayProxyResponse> CreateSuccessfulAddResponse(APIGatewayProxyRequest request)
+        private async Task<APIGatewayProxyResponse> CreateResponse(APIGatewayProxyRequest request)
         {
-            var names = await _dataStore.Get();
             var requestBody = request.Body;
-            if (names.Any(n => n == requestBody) || requestBody == "")
-                return new APIGatewayProxyResponse {StatusCode = 202};
-
+            var isRequestValid = ValidateRequest(requestBody);
+            if (!isRequestValid)
+                return new APIGatewayProxyResponse{StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
+            
             var response = await _dataStore.Post(requestBody);
             return new APIGatewayProxyResponse
             {
@@ -53,6 +53,11 @@ namespace HelloWorld
                     {"ETag", response.ETag}
                 }
             };
+        }
+
+        private static bool ValidateRequest(string requestBody)
+        {
+            return requestBody.Length > 0 && requestBody.Length < 30;
         }
     }
 }
