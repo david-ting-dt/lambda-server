@@ -29,8 +29,8 @@ Resources:
       Handler: HelloWorld::HelloWorld.GetPeopleNamesHandler::GetPeopleNames
       Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
       AutoPublishAlias: live
-        DeploymentPreference:
-          Type: Canary10Percent5Minutes
+      DeploymentPreference:
+        Type: Canary10Percent5Minutes
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -44,8 +44,8 @@ Resources:
       Handler: HelloWorld::HelloWorld.AddPersonHandler::AddPerson
       Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
       AutoPublishAlias: live
-        DeploymentPreference:
-          Type: Canary10Percent5Minutes
+      DeploymentPreference:
+        Type: Canary10Percent5Minutes
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -59,8 +59,8 @@ Resources:
       Handler: HelloWorld::HelloWorld.DeletePersonHandler::DeletePerson
       Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
       AutoPublishAlias: live
-        DeploymentPreference:
-          Type: Canary10Percent5Minutes
+      DeploymentPreference:
+        Type: Canary10Percent5Minutes
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -74,8 +74,8 @@ Resources:
       Handler: HelloWorld::HelloWorld.UpdatePersonHandler::UpdatePerson
       Role: arn:aws:iam::741922737521:role/david-ting-helloworld-stack-HelloWorldFunctionRole-YMHECZ7NFYSH
       AutoPublishAlias: live
-        DeploymentPreference:
-          Type: Canary10Percent5Minutes
+      DeploymentPreference:
+        Type: Canary10Percent5Minutes
       Events:
         HelloWorldDNApi:
           Type: Api
