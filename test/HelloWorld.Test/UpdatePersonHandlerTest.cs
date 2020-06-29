@@ -52,6 +52,15 @@ namespace HelloWorld.Tests
             _mockDataStore.Setup(s3 => s3.Put(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new PutObjectResponse {ETag = "fake_etag"});
         }
+
+        [Fact]
+        public async Task UpdatePerson_ShouldReturnResponseStatusCode400_IfRequestBodyLengthGreaterThan30()
+        {
+            var handler = new UpdatePersonHandler(_mockDataStore.Object);
+            var request = new APIGatewayProxyRequest { Body = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"};
+            var response = await handler.UpdatePerson(request);
+            Assert.Equal(400, response.StatusCode);
+        }
         
         [Fact]
         public async Task UpdatePerson_ShouldReturnResponseStatusCode404_IfUpdateFails()

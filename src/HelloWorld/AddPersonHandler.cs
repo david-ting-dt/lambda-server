@@ -37,7 +37,7 @@ namespace HelloWorld
         private async Task<APIGatewayProxyResponse> CreateResponse(APIGatewayProxyRequest request)
         {
             var requestBody = request.Body;
-            var isRequestValid = ValidateRequest(requestBody);
+            var isRequestValid = Validator.ValidateRequest(requestBody);
             if (!isRequestValid)
                 return new APIGatewayProxyResponse{StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
             
@@ -53,11 +53,6 @@ namespace HelloWorld
                     {"ETag", response.ETag}
                 }
             };
-        }
-
-        private static bool ValidateRequest(string requestBody)
-        {
-            return requestBody.Length > 0 && requestBody.Length < 30;
         }
     }
 }

@@ -39,8 +39,12 @@ namespace HelloWorld
 
         private async Task<APIGatewayProxyResponse> CreateResponse(APIGatewayProxyRequest request)
         {
-            var oldName = request.PathParameters["name"];
             var newName = request.Body;
+            var isRequestValid = Validator.ValidateRequest(newName);
+            if (!isRequestValid)
+                return new APIGatewayProxyResponse { StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
+            
+            var oldName = request.PathParameters["name"];
             var requestETag = request.Headers != null && request.Headers.ContainsKey("If-Match") ? 
                 request.Headers["If-Match"] : "";
             try
