@@ -24,10 +24,10 @@ namespace HelloWorld.Tests
             var request = new APIGatewayProxyRequest
             {
                 Body = "New_Name",
-                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
+                PathParameters = new Dictionary<string, string>{ {"id", "1"} }
             };
             await handler.UpdatePerson(request);
-            _mockDbHandler.Verify(db => db.UpdatePersonAsync("id_to_update", "New_Name"), Times.Once);
+            _mockDbHandler.Verify(db => db.UpdatePersonAsync(1, "New_Name"), Times.Once);
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace HelloWorld.Tests
             var request = new APIGatewayProxyRequest
             {
                 Body = "New_Name",
-                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
+                PathParameters = new Dictionary<string, string>{ {"id", "1"} }
             };
             var response = await handler.UpdatePerson(request);
 
@@ -51,7 +51,7 @@ namespace HelloWorld.Tests
             var request = new APIGatewayProxyRequest
             {
                 Body = "the_length_of_the_request_body_is_greater_than_30",
-                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
+                PathParameters = new Dictionary<string, string>{ {"id", "1"} }
             };
             var response = await handler.UpdatePerson(request);
             Assert.Equal(400, response.StatusCode);
@@ -64,11 +64,11 @@ namespace HelloWorld.Tests
             var request = new APIGatewayProxyRequest
             {
                 Body = "the_length_of_the_request_body_is_greater_than_30",
-                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
+                PathParameters = new Dictionary<string, string>{ {"id", "1"} }
             };
             await handler.UpdatePerson(request);
             _mockDbHandler
-                .Verify(db => db.UpdatePersonAsync(It.IsAny<string>(), It.IsAny<string>()),
+                .Verify(db => db.UpdatePersonAsync(1, It.IsAny<string>()),
                     Times.Never);
         }
 
@@ -76,7 +76,7 @@ namespace HelloWorld.Tests
         public async Task UpdatePerson_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
         {
             _mockDbHandler
-                .Setup(db => db.UpdatePersonAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(db => db.UpdatePersonAsync(It.IsAny<int>(), It.IsAny<string>()))
                 .Throws(new Exception());
             
             var handler = new UpdatePersonHandler(_mockDbHandler.Object);

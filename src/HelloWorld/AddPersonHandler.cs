@@ -42,7 +42,7 @@ namespace HelloWorld
             var isRequestValid = Validator.ValidateRequest(requestBody);
             if (!isRequestValid)
                 return new APIGatewayProxyResponse{StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
-            var id = Guid.NewGuid().ToString();
+            var id = Guid.NewGuid().GetHashCode();
             await _dbHandler.AddPersonAsync(id, requestBody);
             return new APIGatewayProxyResponse
             {

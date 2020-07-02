@@ -23,10 +23,10 @@ namespace HelloWorld.Tests
             var handler = new DeletePersonHandler(_mockDbHandler.Object);
             var request = new APIGatewayProxyRequest
             {
-                PathParameters = new Dictionary<string, string>{{"id", "id_to_delete"}}
+                PathParameters = new Dictionary<string, string>{{"id", "1"}}
             };
             await handler.DeletePerson(request);
-            _mockDbHandler.Verify(db => db.DeletePersonAsync("id_to_delete"), Times.Once);
+            _mockDbHandler.Verify(db => db.DeletePersonAsync(1), Times.Once);
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace HelloWorld.Tests
             var handler = new DeletePersonHandler(_mockDbHandler.Object);
             var request = new APIGatewayProxyRequest
             {
-                PathParameters = new Dictionary<string, string>{{"id", "id_to_delete"}}
+                PathParameters = new Dictionary<string, string>{{"id", "1"}}
             };
             var response = await handler.DeletePerson(request);
             Assert.Equal(204, response.StatusCode);
@@ -45,7 +45,7 @@ namespace HelloWorld.Tests
         public async Task DeletePerson_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
         {
             _mockDbHandler
-                .Setup(db => db.DeletePersonAsync(It.IsAny<string>()))
+                .Setup(db => db.DeletePersonAsync(It.IsAny<int>()))
                 .Throws(new Exception());
             var handler = new DeletePersonHandler(_mockDbHandler.Object);
             var request = new APIGatewayProxyRequest

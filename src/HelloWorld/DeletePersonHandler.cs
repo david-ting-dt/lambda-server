@@ -38,7 +38,7 @@ namespace HelloWorld
 
         private async Task ExecuteDeleteCommand(APIGatewayProxyRequest request)
         {
-            var id = request.PathParameters["id"];
+            var id = int.Parse(request.PathParameters["id"]);
             await _dbHandler.DeletePersonAsync(id);
         }
     }
