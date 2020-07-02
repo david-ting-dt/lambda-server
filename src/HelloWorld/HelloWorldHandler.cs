@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
@@ -12,16 +14,16 @@ namespace HelloWorld
 
     public class HelloWorldHandler
     {
-        private readonly IDataStore _dataStore;
+        private readonly IDbHandler _dbHandler;
 
         public HelloWorldHandler()
         {
-            _dataStore = new S3DataStore();
+            _dbHandler = new DynamoDbHandler(new AmazonDynamoDBClient());
         }
 
-        public HelloWorldHandler(IDataStore dataStore)
+        public HelloWorldHandler(IDbHandler dbHandler)
         {
-            _dataStore = dataStore;
+            _dbHandler = dbHandler;
         }
 
         public async Task<APIGatewayProxyResponse> HelloWorld()
@@ -39,7 +41,8 @@ namespace HelloWorld
 
         private async Task<APIGatewayProxyResponse> CreateResponse()
         {
-            var names = await _dataStore.Get();
+            var people = await _dbHandler.GetPeopleAsync();
+            var names = people.Select(p => p.Name);
             var message = GetHelloMessage(string.Join(", ", names));
 
             return new APIGatewayProxyResponse
