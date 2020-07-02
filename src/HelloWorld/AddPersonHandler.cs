@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
 
@@ -9,16 +10,17 @@ namespace HelloWorld
 {
     public class AddPersonHandler
     {
-        private readonly IDataStore _dataStore;
+        private readonly IDbHandler _dbHandler;
 
         public AddPersonHandler()
         {
-            _dataStore = new S3DataStore();
+            var dbContext = new DynamoDBContext(new AmazonDynamoDBClient());
+            _dbHandler = new DynamoDbHandler(dbContext);
         }
 
-        public AddPersonHandler(IDataStore dataStore)
+        public AddPersonHandler(IDbHandler dbHandler)
         {
-            _dataStore = dataStore;
+            _dbHandler = dbHandler;
         }
 
         public async Task<APIGatewayProxyResponse> AddPerson(APIGatewayProxyRequest request)
@@ -40,8 +42,7 @@ namespace HelloWorld
             var isRequestValid = Validator.ValidateRequest(requestBody);
             if (!isRequestValid)
                 return new APIGatewayProxyResponse{StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
-            
-            var response = await _dataStore.Post(requestBody);
+            await _dbHandler.AddPersonAsync(requestBody);
             return new APIGatewayProxyResponse
             {
                 Body = requestBody,
@@ -50,7 +51,6 @@ namespace HelloWorld
                 {
                     {"Content-Type", "application/json"}, 
                     {"Location", $"{request.Path}/{requestBody}"},
-                    {"ETag", response.ETag}
                 }
             };
         }
