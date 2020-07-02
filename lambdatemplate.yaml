@@ -65,7 +65,7 @@ Resources:
         HelloWorldDNApi:
           Type: Api
           Properties:
-            Path: /people/{name}
+            Path: /people/{id}
             Method: DELETE
 
   UpdatePersonDNFunction:
@@ -80,5 +80,5 @@ Resources:
         HelloWorldDNApi:
           Type: Api
           Properties:
-            Path: /people/{name}
+            Path: /people/{id}
             Method: PUT
