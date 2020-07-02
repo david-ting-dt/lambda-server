@@ -1,93 +1,92 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
-using Amazon.S3;
-using Amazon.S3.Model;
 using HelloWorld.Interfaces;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace HelloWorld.Tests
 {
     public class UpdatePersonHandlerTest
     {
-        private readonly Mock<IDataStore> _mockDataStore;
+        private readonly Mock<IDbHandler> _mockDbHandler;
 
         public UpdatePersonHandlerTest()
         {
-            _mockDataStore = new Mock<IDataStore>();
+            _mockDbHandler = new Mock<IDbHandler>();
         }
 
         [Fact]
-        public async Task UpdatePerson_ShouldCallDataStorePutMethodOnce()
+        public async Task UpdatePerson_ShouldCallDbHandlerUpdatePersonAsyncOnce()
         {
-            var handler = new UpdatePersonHandler(_mockDataStore.Object);
-            MockDataStorePutMethod();
-            var request = CreateMockRequest();
-            await handler.UpdatePerson(request);
-            _mockDataStore.Verify(d => d.Put("Old_Name", "New_Name", It.IsAny<string>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task UpdatePerson_ShouldReturnExpectedResponse_IfUpdateSuccessfully()
-        {
-            var handler = new UpdatePersonHandler(_mockDataStore.Object);
-            MockDataStorePutMethod();
-            var request = CreateMockRequest();
-            var response = await handler.UpdatePerson(request);
-            var expected = new APIGatewayProxyResponse
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var request = new APIGatewayProxyRequest
             {
-                StatusCode = 301,
-                Headers = new Dictionary<string, string> { {"Location", "/people/New_Name"}, {"ETag", "fake_etag"} }
+                Body = "New_Name",
+                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
             };
-
-            var responseJson = JsonConvert.SerializeObject(response);
-            var expectedJson = JsonConvert.SerializeObject(expected);
-            Assert.Equal(expectedJson, responseJson);
+            await handler.UpdatePerson(request);
+            _mockDbHandler.Verify(db => db.UpdatePersonAsync("id_to_update", "New_Name"), Times.Once);
         }
 
-        private void MockDataStorePutMethod()
+        [Fact]
+        public async Task UpdatePerson_ShouldReturnResponseStatusCode301_IfUpdateSuccessfully()
         {
-            _mockDataStore.Setup(s3 => s3.Put(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new PutObjectResponse {ETag = "fake_etag"});
-        }
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var request = new APIGatewayProxyRequest
+            {
+                Body = "New_Name",
+                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
+            };
+            var response = await handler.UpdatePerson(request);
 
+            Assert.Equal(301, response.StatusCode);
+        }
+        
         [Fact]
         public async Task UpdatePerson_ShouldReturnResponseStatusCode400_IfRequestBodyLengthGreaterThan30()
         {
-            var handler = new UpdatePersonHandler(_mockDataStore.Object);
-            var request = new APIGatewayProxyRequest { Body = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"};
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var request = new APIGatewayProxyRequest
+            {
+                Body = "the_length_of_the_request_body_is_greater_than_30",
+                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
+            };
             var response = await handler.UpdatePerson(request);
             Assert.Equal(400, response.StatusCode);
         }
-        
+
         [Fact]
-        public async Task UpdatePerson_ShouldReturnResponseStatusCode404_IfUpdateFails()
+        public async Task UpdatePerson_ShouldNotCallDbHandlerUpdatePersonAsync_IfRequestBodyLengthGreaterThan30()
         {
-            var handler = new UpdatePersonHandler(_mockDataStore.Object);
-            var request = CreateMockRequest();
-            MockFailedDataStoreUpdate();
-            var response = await handler.UpdatePerson(request);
-            Assert.Equal(404, response.StatusCode);
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var request = new APIGatewayProxyRequest
+            {
+                Body = "the_length_of_the_request_body_is_greater_than_30",
+                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
+            };
+            await handler.UpdatePerson(request);
+            _mockDbHandler
+                .Verify(db => db.UpdatePersonAsync(It.IsAny<string>(), It.IsAny<string>()),
+                    Times.Never);
         }
 
-        private void MockFailedDataStoreUpdate()
+        [Fact]
+        public async Task UpdatePerson_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
         {
-            _mockDataStore
-                .Setup(d => d.Put("Old_Name", "New_Name", It.IsAny<string>()))
-                .Callback(() => throw new AmazonS3Exception("Cannot find 'Old_Name'"));
-        }
-        
-        private static APIGatewayProxyRequest CreateMockRequest()
-        {
-            return new APIGatewayProxyRequest
+            _mockDbHandler
+                .Setup(db => db.UpdatePersonAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws(new Exception());
+            
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var request = new APIGatewayProxyRequest
             {
-                PathParameters = new Dictionary<string, string> { {"name", "Old_Name"} },
                 Body = "New_Name",
-                Path = "/people/Old_Name",
-                Headers = null
+                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
             };
+            var response = await handler.UpdatePerson(request);
+            Assert.Equal(500, response.StatusCode);
         }
     }
 }
