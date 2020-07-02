@@ -1,24 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
-using Newtonsoft.Json;
 
 namespace HelloWorld
 {
     public class GetPeopleNamesHandler
     {
-        private readonly IDataStore _dataStore;
+        private readonly IDbHandler _dbHandler;
 
         public GetPeopleNamesHandler()
         {
-            _dataStore = new S3DataStore();
+            _dbHandler = new DynamoDbHandler(new AmazonDynamoDBClient());
         }
 
-        public GetPeopleNamesHandler(IDataStore dataStore)
+        public GetPeopleNamesHandler(IDbHandler dbHandler)
         {
-            _dataStore = dataStore;
+            _dbHandler = dbHandler;
         }
 
         public async Task<APIGatewayProxyResponse> GetPeopleNames()
@@ -36,7 +37,8 @@ namespace HelloWorld
 
         private async Task<APIGatewayProxyResponse> CreateResponse()
         {
-            var names = await _dataStore.Get();
+            var people = await _dbHandler.GetPeopleAsync();
+            var names = people.Select(p => p.Name);
             var body = string.Join(", ", names);
 
             return new APIGatewayProxyResponse

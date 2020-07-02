@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using HelloWorld.DbItem;
 using HelloWorld.Interfaces;
 using Moq;
 using Xunit;
@@ -8,30 +10,59 @@ namespace HelloWorld.Tests
 {
     public class GetPeopleNamesHandlerTest
     {
-        private readonly Mock<IDataStore> _mockDataStore;
+        private readonly Mock<IDbHandler> _mockDbHandler;
+        private readonly List<Person> _people = new List<Person>
+        {
+            new Person { Id = "1", Name = "David" },
+            new Person { Id = "2", Name = "Michael" },
+            new Person { Id = "3", Name = "Will" }
+        };
         
         public GetPeopleNamesHandlerTest()
         {
-            _mockDataStore = new Mock<IDataStore>();
-            _mockDataStore
-                .Setup(d => d.Get())
-                .ReturnsAsync(new List<string> {"David", "Michael", "Will"});
+            _mockDbHandler = new Mock<IDbHandler>();
         }
 
         [Fact]
-        public async Task GetPeopleNames_ShouldCallDataStoreGetMethodOnce()
+        public async Task GetPeopleNames_ShouldCallDbHandlerGetPeopleAsyncOnce()
         {
-            var handler = new GetPeopleNamesHandler(_mockDataStore.Object);
+            var handler = new GetPeopleNamesHandler(_mockDbHandler.Object);
             await handler.GetPeopleNames();
-            _mockDataStore.Verify(d => d.Get(), Times.Once);
+            _mockDbHandler.Verify(db => db.GetPeopleAsync(), Times.Once);
         }
 
         [Fact]
-        public async Task GetPeopleNames_ShouldReturnResponseStatusCode200()
+        public async Task GetPeopleNames_ShouldReturnResponseStatusCode200_IfSuccessful()
         {
-            var handler = new GetPeopleNamesHandler(_mockDataStore.Object);
+            _mockDbHandler
+                .Setup(db => db.GetPeopleAsync())
+                .ReturnsAsync(_people);
+            var handler = new GetPeopleNamesHandler(_mockDbHandler.Object);
             var response = await handler.GetPeopleNames();
             Assert.Equal(200, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetPeopleNames_ShouldReturnCorrectResponseBody_IfSuccessful()
+        {
+            _mockDbHandler
+                .Setup(db => db.GetPeopleAsync())
+                .ReturnsAsync(_people);
+            var handler = new GetPeopleNamesHandler(_mockDbHandler.Object);
+            var response = await handler.GetPeopleNames();
+            const string expected = "David, Michael, Will";
+            Assert.Equal(expected, response.Body);
+        }
+
+        [Fact]
+        public async Task GetPeopleNames_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
+        {
+            _mockDbHandler
+                .Setup(db => db.GetPeopleAsync())
+                .Throws(new Exception());
+            var handler = new GetPeopleNamesHandler(_mockDbHandler.Object);
+            var response = await handler.GetPeopleNames();
+            Assert.Equal(500, response.StatusCode);
         }
     }
 }
