@@ -25,7 +25,7 @@ namespace HelloWorld.Tests
       }
 
       [Fact]
-      public async Task HelloWorld_ShouldCallDbContextScanAsyncMethodOnce()
+      public async Task HelloWorld_ShouldCallDbHandlerGetPeopleAsyncOnce()
       {
           var handler = new HelloWorldHandler(_mockDbHandler.Object);
           await handler.HelloWorld();
@@ -43,7 +43,6 @@ namespace HelloWorld.Tests
           Assert.Equal(200, response.StatusCode);
       }
       
-      // should return correct message
       [Fact]
       public async Task HelloWorld_ShouldReturnCorrectMessage_IfSuccessful()
       {
