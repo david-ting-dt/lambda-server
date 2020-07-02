@@ -70,7 +70,7 @@ namespace HelloWorld.Tests
         public async Task AddPersonAsync_ShouldCallDynamoDBContextSaveAsyncOnce()
         {
             var dbHandler = new DynamoDbHandler(_mockContext.Object);
-            await dbHandler.AddPersonAsync("New_Person_Name");
+            await dbHandler.AddPersonAsync("new_guid", "New_Person_Name");
             _mockContext.Verify(context => 
                 context.SaveAsync(It.IsAny<Person>(), It.IsAny<CancellationToken>()), Times.Once);
         }

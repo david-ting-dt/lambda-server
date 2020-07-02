@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,11 +40,11 @@ namespace HelloWorld
             };
         }
 
-        public async Task AddPersonAsync(string name)
+        public async Task AddPersonAsync(string id, string name)
         {
             var newPerson = new Person
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = id,
                 Name = name
             };
             await _dbContext.SaveAsync(newPerson);
