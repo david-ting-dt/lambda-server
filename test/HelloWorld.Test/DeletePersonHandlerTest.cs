@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
@@ -9,35 +10,50 @@ namespace HelloWorld.Tests
 {
     public class DeletePersonHandlerTest
     {
-        private readonly Mock<IDataStore> _mockDataStore;
+        private readonly Mock<IDbHandler> _mockDbHandler;
 
         public DeletePersonHandlerTest()
         {
-            _mockDataStore = new Mock<IDataStore>();
+            _mockDbHandler = new Mock<IDbHandler>();
         }
 
         [Fact]
-        public async Task DeletePerson_ShouldCallDataStoreDeleteMethodOnce()
+        public async Task DeletePerson_ShouldCallDbHandlerDeleteAsyncOnce()
         {
-            var handler = new DeletePersonHandler(_mockDataStore.Object);
+            var handler = new DeletePersonHandler(_mockDbHandler.Object);
             var request = new APIGatewayProxyRequest
             {
-                PathParameters = new Dictionary<string, string>{{"name", "Name_to_delete"}}
+                PathParameters = new Dictionary<string, string>{{"id", "id_to_delete"}}
             };
             await handler.DeletePerson(request);
-            _mockDataStore.Verify(d => d.Delete("Name_to_delete", It.IsAny<string>()), Times.Once);
+            _mockDbHandler.Verify(db => db.DeletePersonAsync("id_to_delete"), Times.Once);
         }
 
         [Fact]
         public async Task DeletePerson_ShouldReturnResponseStatusCode204_IfDeleteSuccessfully()
         {
-            var handler = new DeletePersonHandler(_mockDataStore.Object);
+            var handler = new DeletePersonHandler(_mockDbHandler.Object);
             var request = new APIGatewayProxyRequest
             {
-                PathParameters = new Dictionary<string, string>{{"name", "Name_to_delete"}}
+                PathParameters = new Dictionary<string, string>{{"id", "id_to_delete"}}
             };
             var response = await handler.DeletePerson(request);
             Assert.Equal(204, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task DeletePerson_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
+        {
+            _mockDbHandler
+                .Setup(db => db.DeletePersonAsync(It.IsAny<string>()))
+                .Throws(new Exception());
+            var handler = new DeletePersonHandler(_mockDbHandler.Object);
+            var request = new APIGatewayProxyRequest
+            {
+                PathParameters = new Dictionary<string, string>{{"id", "id_to_delete"}}
+            };
+            var response = await handler.DeletePerson(request);
+            Assert.Equal(500, response.StatusCode);
         }
     }
 }

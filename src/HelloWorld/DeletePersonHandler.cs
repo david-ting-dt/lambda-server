@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
 
@@ -7,16 +9,17 @@ namespace HelloWorld
 {
     public class DeletePersonHandler
     {
-        private readonly IDataStore _dataStore;
+        private readonly IDbHandler _dbHandler;
 
         public DeletePersonHandler()
         {
-            _dataStore = new S3DataStore();
+            var dbContext = new DynamoDBContext(new AmazonDynamoDBClient());
+            _dbHandler = new DynamoDbHandler(dbContext);
         }
 
-        public DeletePersonHandler(IDataStore dataStore)
+        public DeletePersonHandler(IDbHandler dbHandler)
         {
-            _dataStore = dataStore;
+            _dbHandler = dbHandler;
         }
 
         public async Task<APIGatewayProxyResponse> DeletePerson(APIGatewayProxyRequest request)
@@ -35,8 +38,8 @@ namespace HelloWorld
 
         private async Task ExecuteDeleteCommand(APIGatewayProxyRequest request)
         {
-            var key = request.PathParameters["name"];
-            await _dataStore.Delete(key);
+            var id = request.PathParameters["id"];
+            await _dbHandler.DeletePersonAsync(id);
         }
     }
 }
