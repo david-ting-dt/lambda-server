@@ -35,7 +35,7 @@ namespace HelloWorld
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return DefaultServerResponse.CreateServerErrorResponse();
+                return DefaultServerResponse.CreateServerErrorResponse(e);
             }
         }
 

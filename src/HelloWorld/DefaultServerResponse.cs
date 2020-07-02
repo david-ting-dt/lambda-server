@@ -1,14 +1,15 @@
+using System;
 using Amazon.Lambda.APIGatewayEvents;
 
 namespace HelloWorld
 {
     public static class DefaultServerResponse
     {
-        public static APIGatewayProxyResponse CreateServerErrorResponse()
+        public static APIGatewayProxyResponse CreateServerErrorResponse(Exception e)
         {
             return new APIGatewayProxyResponse
             {
-                Body = "Ah oh... you've crashed our server :(",
+                Body = e.ToString(),
                 StatusCode = 500,
             };
         }
