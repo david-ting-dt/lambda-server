@@ -43,7 +43,7 @@ namespace HelloWorld
             if (!isRequestValid)
                 return new APIGatewayProxyResponse{StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
             var id = Guid.NewGuid().ToString();
-            await _dbHandler.AddPersonAsync(requestBody, id);
+            await _dbHandler.AddPersonAsync(id, requestBody);
             return new APIGatewayProxyResponse
             {
                 Body = requestBody,
