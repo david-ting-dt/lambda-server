@@ -21,11 +21,11 @@ namespace HelloWorld.Tests
             {
                 new Dictionary<string, AttributeValue>
                 {
-                    {"id", new AttributeValue("1")}, {"name", new AttributeValue("David")}
+                    {"id", new AttributeValue {N = "1"}}, {"name", new AttributeValue("David")}
                 },
                 new Dictionary<string, AttributeValue>
                 {
-                    {"id", new AttributeValue("2")}, {"name", new AttributeValue("Michael")}
+                    {"id", new AttributeValue {N ="2"}}, {"name", new AttributeValue("Michael")}
                 }
             }
         };

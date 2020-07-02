@@ -35,7 +35,7 @@ namespace HelloWorld
         {
             return new Person
             {
-                Id = int.Parse(item["id"].S),
+                Id = int.Parse(item["id"].N),
                 Name = item["name"].S
             };
         }
