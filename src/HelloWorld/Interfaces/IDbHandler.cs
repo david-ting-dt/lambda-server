@@ -7,8 +7,8 @@ namespace HelloWorld.Interfaces
     public interface IDbHandler
     {
         Task<List<Person>> GetPeopleAsync();
-        Task AddPersonAsync(int id, string name);
-        Task DeletePersonAsync(int id);
-        Task UpdatePersonAsync(int id, string newName);
+        Task AddPersonAsync(string id, string name);
+        Task DeletePersonAsync(string id);
+        Task UpdatePersonAsync(string id, string newName);
     }
 }

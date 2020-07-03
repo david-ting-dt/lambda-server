@@ -40,7 +40,7 @@ namespace HelloWorld
 
         private async Task<APIGatewayProxyResponse> CreateResponse(APIGatewayProxyRequest request)
         {
-            var id = int.Parse(request.PathParameters["id"]);
+            var id = request.PathParameters["id"];
             var newName = request.Body;
             var isRequestValid = Validator.ValidateRequest(newName);
             if (!isRequestValid)
