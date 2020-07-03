@@ -13,9 +13,9 @@ namespace HelloWorld.Tests
         private readonly Mock<IDbHandler> _mockDbHandler;
         private readonly List<Person> _people = new List<Person>
         {
-            new Person { Id = 1, Name = "David" },
-            new Person { Id = 2, Name = "Michael" },
-            new Person { Id = 3, Name = "Will" }
+            new Person { Id = "1", Name = "David" },
+            new Person { Id = "2", Name = "Michael" },
+            new Person { Id = "3", Name = "Will" }
         };
         
         public GetPeopleNamesHandlerTest()

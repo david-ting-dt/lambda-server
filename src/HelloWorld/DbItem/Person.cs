@@ -6,7 +6,7 @@ namespace HelloWorld.DbItem
     public class Person
     {
         [DynamoDBHashKey("id")]
-        public int Id { get; set; }
+        public string Id { get; set; }
         [DynamoDBProperty("name")]
         public string Name { get; set; }
     }

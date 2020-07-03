@@ -23,7 +23,7 @@ namespace HelloWorld.Tests
             var request = new APIGatewayProxyRequest { Body = "Name_to_add" };
             await handler.AddPerson(request);
             _mockDbHandler
-                .Verify(db => db.AddPersonAsync(It.IsAny<int>(), request.Body), Times.Once);
+                .Verify(db => db.AddPersonAsync(It.IsAny<string>(), request.Body), Times.Once);
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace HelloWorld.Tests
         public async Task AddPerson_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
         {
             _mockDbHandler
-                .Setup(db => db.AddPersonAsync(It.IsAny<int>(), It.IsAny<string>()))
+                .Setup(db => db.AddPersonAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new Exception());
             var handler = new AddPersonHandler(_mockDbHandler.Object);
             var request = new APIGatewayProxyRequest { Body = "Name_To_ADd"};
