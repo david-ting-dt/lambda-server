@@ -35,12 +35,12 @@ namespace HelloWorld
         {
             return new Person
             {
-                Id = item["id"].N,
+                Id = int.Parse(item["id"].N),
                 Name = item["name"].S
             };
         }
 
-        public async Task AddPersonAsync(string id, string name)
+        public async Task AddPersonAsync(int id, string name)
         {
             var newPerson = new Person
             {
@@ -50,13 +50,13 @@ namespace HelloWorld
             await _dbContext.SaveAsync(newPerson);
         }
 
-        public async Task DeletePersonAsync(string id)
+        public async Task DeletePersonAsync(int id)
         {
             var personToDelete = await _dbContext.LoadAsync<Person>(id);
             await _dbContext.DeleteAsync(personToDelete);
         }
 
-        public async Task UpdatePersonAsync(string id, string newName)
+        public async Task UpdatePersonAsync(int id, string newName)
         {
             var personToUpdate = await _dbContext.LoadAsync<Person>(id);
             personToUpdate.Name = newName;

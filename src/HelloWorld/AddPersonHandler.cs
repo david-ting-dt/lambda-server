@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace HelloWorld
 {
@@ -44,7 +42,7 @@ namespace HelloWorld
             var isRequestValid = Validator.ValidateRequest(requestBody);
             if (!isRequestValid)
                 return new APIGatewayProxyResponse{StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
-            var id = GenerateNewId();
+            var id = Guid.NewGuid().GetHashCode();
             await _dbHandler.AddPersonAsync(id, requestBody);
             return new APIGatewayProxyResponse
             {
@@ -56,12 +54,6 @@ namespace HelloWorld
                     {"Location", $"{request.Path}/{id}"},
                 }
             };
-        }
-
-        private static string GenerateNewId()
-        {
-            var guid = Guid.NewGuid().ToString();
-            return string.Join("", guid.Where(char.IsDigit));
         }
     }
 }

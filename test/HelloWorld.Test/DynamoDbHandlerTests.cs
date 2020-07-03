@@ -58,7 +58,7 @@ namespace HelloWorld.Tests
             var result = await dbHandler.GetPeopleAsync();
             var expected = new List<Person>
             {
-                new Person{Id = "1", Name = "David"}, new Person{Id = "2", Name = "Michael"}
+                new Person{Id = 1, Name = "David"}, new Person{Id = 2, Name = "Michael"}
             };
             var resultJson = JsonConvert.SerializeObject(result);
             var expectedJson = JsonConvert.SerializeObject(expected);
@@ -70,7 +70,7 @@ namespace HelloWorld.Tests
         public async Task AddPersonAsync_ShouldCallDynamoDBContextSaveAsyncOnce()
         {
             var dbHandler = new DynamoDbHandler(_mockContext.Object);
-            await dbHandler.AddPersonAsync("123", "New_Person_Name");
+            await dbHandler.AddPersonAsync(123, "New_Person_Name");
             _mockContext.Verify(context => 
                 context.SaveAsync(It.IsAny<Person>(), It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -79,9 +79,9 @@ namespace HelloWorld.Tests
         public async Task DeletePersonAsync_ShouldCallDynamoDBContextLoadAsyncOnce()
         {
             var dbHandler = new DynamoDbHandler(_mockContext.Object);
-            await dbHandler.DeletePersonAsync("1");
+            await dbHandler.DeletePersonAsync(1);
             _mockContext.Verify(context =>
-                context.LoadAsync<Person>("1", It.IsAny<CancellationToken>()), 
+                context.LoadAsync<Person>(1, It.IsAny<CancellationToken>()), 
                 Times.Once);
         }
         
@@ -89,7 +89,7 @@ namespace HelloWorld.Tests
         public async Task DeletePersonAsync_ShouldCallDynamoDBContextDeleteAsyncOnce()
         {
             var dbHandler = new DynamoDbHandler(_mockContext.Object);
-            await dbHandler.DeletePersonAsync("1");
+            await dbHandler.DeletePersonAsync(1);
             _mockContext.Verify(context =>
                 context.DeleteAsync(It.IsAny<Person>(), It.IsAny<CancellationToken>()),
                 Times.Once);
@@ -100,9 +100,9 @@ namespace HelloWorld.Tests
         {
             MockLoadingPersonFromDb();
             var dbHandler = new DynamoDbHandler(_mockContext.Object);
-            await dbHandler.UpdatePersonAsync("1", "New_Name");
+            await dbHandler.UpdatePersonAsync(1, "New_Name");
             _mockContext.Verify(context =>
-                context.LoadAsync<Person>("1", It.IsAny<CancellationToken>()),
+                context.LoadAsync<Person>(1, It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
@@ -111,7 +111,7 @@ namespace HelloWorld.Tests
         {
             MockLoadingPersonFromDb();
             var dbHandler = new DynamoDbHandler(_mockContext.Object);
-            await dbHandler.UpdatePersonAsync("1", "New_Name");
+            await dbHandler.UpdatePersonAsync(1, "New_Name");
             _mockContext.Verify(context => 
                 context.SaveAsync(It.IsAny<Person>(), It.IsAny<CancellationToken>()),
                 Times.Once);
@@ -120,8 +120,8 @@ namespace HelloWorld.Tests
         private void MockLoadingPersonFromDb()
         {
             _mockContext.Setup(context => 
-                    context.LoadAsync<Person>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new Person {Id = "1", Name = "Old_Name"});
+                    context.LoadAsync<Person>(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Person {Id = 123, Name = "Old_Name"});
         }
     }
 }
