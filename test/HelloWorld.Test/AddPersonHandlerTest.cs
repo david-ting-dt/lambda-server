@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
+using HelloWorld.DbItem;
 using HelloWorld.Interfaces;
 using Moq;
 using Xunit;
@@ -19,6 +21,8 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task AddPerson_ShouldCallDbHandlerAddPersonAsyncOnce()
         {
+            _mockDbHandler.Setup(db => db.GetPeopleAsync())
+                .ReturnsAsync(new List<Person>{new Person{Id = 1, Name = "David"}});
             var handler = new AddPersonHandler(_mockDbHandler.Object);
             var request = new APIGatewayProxyRequest { Body = "Name_to_add" };
             await handler.AddPerson(request);
@@ -29,6 +33,8 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task AddPerson_ShouldReturnResponseStatusCode200_IfSuccessfullyAdded()
         {
+            _mockDbHandler.Setup(db => db.GetPeopleAsync())
+                .ReturnsAsync(new List<Person>());
             var handler = new AddPersonHandler(_mockDbHandler.Object);
             var request = new APIGatewayProxyRequest { Body = "Name_to_add" };
             var response = await handler.AddPerson(request);

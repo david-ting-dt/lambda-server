@@ -60,6 +60,8 @@ namespace HelloWorld
         private async Task<int> GenerateNewId()
         {
             var people = await _dbHandler.GetPeopleAsync();
+            if (people.Count == 0)
+                return 0;
             var id = people.Select(p => p.Id).Max() + 1;
             return id;
         }
