@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.DbItem;
 using HelloWorld.Interfaces;
 using Moq;
@@ -12,6 +13,8 @@ namespace HelloWorld.Tests
   public class HelloWorldHandlerTest
   {
       private readonly Mock<IDbHandler> _mockDbHandler;
+
+      private readonly APIGatewayProxyRequest _fakeRequest = new APIGatewayProxyRequest { HttpMethod = "Get" };
       private readonly List<Person> _people = new List<Person>
       {
           new Person { Id = "1", Name = "David" },
@@ -28,7 +31,7 @@ namespace HelloWorld.Tests
       public async Task HelloWorld_ShouldCallDbHandlerGetPeopleAsyncOnce()
       {
           var handler = new HelloWorldHandler(_mockDbHandler.Object);
-          await handler.HelloWorld();
+          await handler.HelloWorld(_fakeRequest);
           _mockDbHandler.Verify(db => db.GetPeopleAsync(), Times.Once);
       }
       
@@ -39,7 +42,7 @@ namespace HelloWorld.Tests
               .Setup(db => db.GetPeopleAsync())
               .ReturnsAsync(_people);
           var handler = new HelloWorldHandler(_mockDbHandler.Object);
-          var response = await handler.HelloWorld();
+          var response = await handler.HelloWorld(_fakeRequest);
           Assert.Equal(200, response.StatusCode);
       }
       
@@ -50,7 +53,7 @@ namespace HelloWorld.Tests
               .Setup(db => db.GetPeopleAsync())
               .ReturnsAsync(_people);
           var handler = new HelloWorldHandler(_mockDbHandler.Object);
-          var response = await handler.HelloWorld();
+          var response = await handler.HelloWorld(_fakeRequest);
           
           var time = DateTime.Now.ToShortTimeString();
           var date = DateTime.Now.ToLongDateString();
@@ -65,7 +68,7 @@ namespace HelloWorld.Tests
               .Setup(db => db.GetPeopleAsync())
               .Throws(new Exception());
           var handler = new HelloWorldHandler(_mockDbHandler.Object);
-          var response = await handler.HelloWorld();
+          var response = await handler.HelloWorld(_fakeRequest);
           Assert.Equal(500, response.StatusCode);
       }
 
