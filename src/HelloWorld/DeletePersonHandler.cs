@@ -27,7 +27,11 @@ namespace HelloWorld
             try
             {
                 await ExecuteDeleteCommand(request);
-                return new APIGatewayProxyResponse { StatusCode = 204 };
+                return new APIGatewayProxyResponse {StatusCode = 204};
+            }
+            catch (NullReferenceException)
+            {
+                return new APIGatewayProxyResponse {StatusCode = 404, Body = "Resource not found"};
             }
             catch (Exception e)
             {

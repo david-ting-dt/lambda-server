@@ -11,6 +11,10 @@ namespace HelloWorld.Tests
     public class DeletePersonHandlerTest
     {
         private readonly Mock<IDbHandler> _mockDbHandler;
+        private readonly APIGatewayProxyRequest _deleteRequest = new APIGatewayProxyRequest
+        {
+            PathParameters = new Dictionary<string, string>{{"id", "1"}}
+        };
 
         public DeletePersonHandlerTest()
         {
@@ -21,11 +25,7 @@ namespace HelloWorld.Tests
         public async Task DeletePerson_ShouldCallDbHandlerDeleteAsyncOnce()
         {
             var handler = new DeletePersonHandler(_mockDbHandler.Object);
-            var request = new APIGatewayProxyRequest
-            {
-                PathParameters = new Dictionary<string, string>{{"id", "1"}}
-            };
-            await handler.DeletePerson(request);
+            await handler.DeletePerson(_deleteRequest);
             _mockDbHandler.Verify(db => db.DeletePersonAsync("1"), Times.Once);
         }
 
@@ -33,11 +33,7 @@ namespace HelloWorld.Tests
         public async Task DeletePerson_ShouldReturnResponseStatusCode204_IfDeleteSuccessfully()
         {
             var handler = new DeletePersonHandler(_mockDbHandler.Object);
-            var request = new APIGatewayProxyRequest
-            {
-                PathParameters = new Dictionary<string, string>{{"id", "1"}}
-            };
-            var response = await handler.DeletePerson(request);
+            var response = await handler.DeletePerson(_deleteRequest);
             Assert.Equal(204, response.StatusCode);
         }
 
@@ -48,12 +44,19 @@ namespace HelloWorld.Tests
                 .Setup(db => db.DeletePersonAsync(It.IsAny<string>()))
                 .Throws(new Exception());
             var handler = new DeletePersonHandler(_mockDbHandler.Object);
-            var request = new APIGatewayProxyRequest
-            {
-                PathParameters = new Dictionary<string, string>{{"id", "id_to_delete"}}
-            };
-            var response = await handler.DeletePerson(request);
+            var response = await handler.DeletePerson(_deleteRequest);
             Assert.Equal(500, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task DeletePerson_ShouldReturnResponseStatusCode404_IfNullReferenceExceptionCaught()
+        {
+            _mockDbHandler
+                .Setup(db => db.DeletePersonAsync(It.IsAny<string>()))
+                .Throws(new NullReferenceException());
+            var handler = new DeletePersonHandler(_mockDbHandler.Object);
+            var response = await handler.DeletePerson(_deleteRequest);
+            Assert.Equal(404, response.StatusCode);
         }
     }
 }
