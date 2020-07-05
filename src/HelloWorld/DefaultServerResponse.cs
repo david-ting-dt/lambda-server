@@ -5,11 +5,11 @@ namespace HelloWorld
 {
     public static class DefaultServerResponse
     {
-        public static APIGatewayProxyResponse CreateServerErrorResponse(Exception e)
+        public static APIGatewayProxyResponse CreateServerErrorResponse()
         {
             return new APIGatewayProxyResponse
             {
-                Body = e.ToString(),
+                Body = "Internal server error",
                 StatusCode = 500,
             };
         }

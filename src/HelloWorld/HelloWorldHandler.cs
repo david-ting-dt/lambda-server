@@ -27,15 +27,15 @@ namespace HelloWorld
         }
 
         public async Task<APIGatewayProxyResponse> HelloWorld()
-        {
+        { 
             try
             {
                 return await CreateResponse();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                return DefaultServerResponse.CreateServerErrorResponse(e);
+                LambdaLogger.Log(e.ToString());
+                return DefaultServerResponse.CreateServerErrorResponse();
             }
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
+using Amazon.Lambda.Core;
 using HelloWorld.Interfaces;
 
 namespace HelloWorld
@@ -30,8 +31,8 @@ namespace HelloWorld
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                return DefaultServerResponse.CreateServerErrorResponse(e);
+                LambdaLogger.Log(e.ToString());
+                return DefaultServerResponse.CreateServerErrorResponse();
             }
         }
 
