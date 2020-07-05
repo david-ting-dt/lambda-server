@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -78,6 +79,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task DeletePersonAsync_ShouldCallDynamoDBContextLoadAsyncOnce()
         {
+            MockLoadingPersonFromDb();
             var dbHandler = new DynamoDbHandler(_mockContext.Object);
             await dbHandler.DeletePersonAsync("1");
             _mockContext.Verify(context =>
@@ -88,11 +90,21 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task DeletePersonAsync_ShouldCallDynamoDBContextDeleteAsyncOnce()
         {
+            MockLoadingPersonFromDb();
             var dbHandler = new DynamoDbHandler(_mockContext.Object);
             await dbHandler.DeletePersonAsync("1");
             _mockContext.Verify(context =>
                 context.DeleteAsync(It.IsAny<Person>(), It.IsAny<CancellationToken>()),
                 Times.Once);
+        }
+
+        [Fact]
+        public async Task DeletePersonAsync_ShouldThrowNullReferenceException_PersonToDeleteIsNull()
+        {
+            MockLoadingNullPersonFromDb();
+            var dbHandler = new DynamoDbHandler(_mockContext.Object);
+            await Assert.ThrowsAsync<NullReferenceException>(async () =>
+                await dbHandler.DeletePersonAsync("non-existent_id"));
         }
 
         [Fact]
@@ -117,11 +129,27 @@ namespace HelloWorld.Tests
                 Times.Once);
         }
 
+        [Fact]
+        public async Task UpdatePersonAsync_ShouldThrowNullReferenceException_IfPersonToUpdateIsNull()
+        {
+            MockLoadingNullPersonFromDb();
+            var dbHandler = new DynamoDbHandler(_mockContext.Object);
+            await Assert.ThrowsAsync<NullReferenceException>(async () =>
+                await dbHandler.UpdatePersonAsync("non-existent_id", "New_Name"));
+        }
+
         private void MockLoadingPersonFromDb()
         {
             _mockContext.Setup(context => 
                     context.LoadAsync<Person>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Person {Id = "1", Name = "Old_Name"});
+        }
+
+        private void MockLoadingNullPersonFromDb()
+        {
+            _mockContext.Setup(context => 
+                    context.LoadAsync<Person>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Person) null);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -53,12 +54,16 @@ namespace HelloWorld
         public async Task DeletePersonAsync(string id)
         {
             var personToDelete = await _dbContext.LoadAsync<Person>(id);
+            if (personToDelete == null)
+                throw new NullReferenceException();
             await _dbContext.DeleteAsync(personToDelete);
         }
 
         public async Task UpdatePersonAsync(string id, string newName)
         {
             var personToUpdate = await _dbContext.LoadAsync<Person>(id);
+            if (personToUpdate == null)
+                throw new NullReferenceException();
             personToUpdate.Name = newName;
             await _dbContext.SaveAsync(personToUpdate);
         }
