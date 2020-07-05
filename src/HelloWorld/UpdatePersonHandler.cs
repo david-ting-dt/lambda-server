@@ -31,6 +31,10 @@ namespace HelloWorld
             {
                 return await CreateResponse(request);
             }
+            catch (NullReferenceException)
+            {
+                return new APIGatewayProxyResponse { StatusCode = 404, Body = "Resource not found" };
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e);

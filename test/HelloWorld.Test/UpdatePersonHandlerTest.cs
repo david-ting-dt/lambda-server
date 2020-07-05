@@ -11,6 +11,11 @@ namespace HelloWorld.Tests
     public class UpdatePersonHandlerTest
     {
         private readonly Mock<IDbHandler> _mockDbHandler;
+        private readonly APIGatewayProxyRequest _updateRequest = new APIGatewayProxyRequest
+        {
+            Body = "New_Name",
+            PathParameters = new Dictionary<string, string>{ {"id", "1"} }
+        };
 
         public UpdatePersonHandlerTest()
         {
@@ -21,12 +26,7 @@ namespace HelloWorld.Tests
         public async Task UpdatePerson_ShouldCallDbHandlerUpdatePersonAsyncOnce()
         {
             var handler = new UpdatePersonHandler(_mockDbHandler.Object);
-            var request = new APIGatewayProxyRequest
-            {
-                Body = "New_Name",
-                PathParameters = new Dictionary<string, string>{ {"id", "1"} }
-            };
-            await handler.UpdatePerson(request);
+            await handler.UpdatePerson(_updateRequest);
             _mockDbHandler.Verify(db => db.UpdatePersonAsync("1", "New_Name"), Times.Once);
         }
 
@@ -34,12 +34,7 @@ namespace HelloWorld.Tests
         public async Task UpdatePerson_ShouldReturnResponseStatusCode301_IfUpdateSuccessfully()
         {
             var handler = new UpdatePersonHandler(_mockDbHandler.Object);
-            var request = new APIGatewayProxyRequest
-            {
-                Body = "New_Name",
-                PathParameters = new Dictionary<string, string>{ {"id", "1"} }
-            };
-            var response = await handler.UpdatePerson(request);
+            var response = await handler.UpdatePerson(_updateRequest);
 
             Assert.Equal(301, response.StatusCode);
         }
@@ -80,13 +75,19 @@ namespace HelloWorld.Tests
                 .Throws(new Exception());
             
             var handler = new UpdatePersonHandler(_mockDbHandler.Object);
-            var request = new APIGatewayProxyRequest
-            {
-                Body = "New_Name",
-                PathParameters = new Dictionary<string, string>{ {"id", "id_to_update"} }
-            };
-            var response = await handler.UpdatePerson(request);
+            var response = await handler.UpdatePerson(_updateRequest);
             Assert.Equal(500, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task UpdatePerson_ShouldReturnResponseStatusCode404_IfNullReferenceExceptionIsCaught()
+        {
+            _mockDbHandler
+                .Setup(db => db.UpdatePersonAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws(new NullReferenceException());
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var response = await handler.UpdatePerson(_updateRequest);
+            Assert.Equal(404, response.StatusCode);
         }
     }
 }
