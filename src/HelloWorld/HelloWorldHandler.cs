@@ -29,7 +29,7 @@ namespace HelloWorld
 
         public async Task<APIGatewayProxyResponse> HelloWorld(APIGatewayProxyRequest request)
         { 
-            LambdaLogger.Log("API GATEWAY REQUEST: " + JsonConvert.SerializeObject(request));
+            LambdaLogger.Log($"API GATEWAY REQUEST: {JsonConvert.SerializeObject(request)}");
             try
             {
                 return await CreateResponse();
@@ -52,7 +52,7 @@ namespace HelloWorld
                 StatusCode = 200,
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
-            LambdaLogger.Log("API GATEWAY RESPONSE: " + JsonConvert.SerializeObject(response));
+            LambdaLogger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
             return response;
         }
 
