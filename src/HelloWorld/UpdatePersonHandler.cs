@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
-using Amazon.Lambda.Core;
 using HelloWorld.Interfaces;
 using Newtonsoft.Json;
 
