@@ -5,46 +5,51 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
+using Newtonsoft.Json;
 
 namespace HelloWorld
 {
     public class AddPersonHandler
     {
         private readonly IDbHandler _dbHandler;
+        private readonly ILogger _logger;
 
         public AddPersonHandler()
         {
             var dbContext = new DynamoDBContext(new AmazonDynamoDBClient());
             _dbHandler = new DynamoDbHandler(dbContext);
+            _logger = new LambdaFnLogger();
         }
 
-        public AddPersonHandler(IDbHandler dbHandler)
+        public AddPersonHandler(IDbHandler dbHandler, ILogger logger)
         {
             _dbHandler = dbHandler;
+            _logger = logger;
         }
 
         public async Task<APIGatewayProxyResponse> AddPerson(APIGatewayProxyRequest request)
         {
+            _logger.Log($"API GATEWAY REQUEST: {JsonConvert.SerializeObject(request)}");
             try
             {
-                return await CreateResponse(request);
+                var isRequestValid = Validator.ValidateRequest(request.Body);
+                return isRequestValid ? await CreateResponse(request) : CreateBadRequestResponse();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e); 
-                return DefaultServerResponse.CreateServerErrorResponse();
+                var response = DefaultServerResponse.CreateServerErrorResponse();
+                _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+                _logger.Log(e.ToString()); 
+                return response;
             }
         }
 
         private async Task<APIGatewayProxyResponse> CreateResponse(APIGatewayProxyRequest request)
         {
             var requestBody = request.Body;
-            var isRequestValid = Validator.ValidateRequest(requestBody);
-            if (!isRequestValid)
-                return new APIGatewayProxyResponse{StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
             var id = Guid.NewGuid().ToString();
             await _dbHandler.AddPersonAsync(id, requestBody);
-            return new APIGatewayProxyResponse
+            var response = new APIGatewayProxyResponse
             {
                 Body = requestBody,
                 StatusCode = 200,
@@ -54,6 +59,16 @@ namespace HelloWorld
                     {"Location", $"{request.Path}/{id}"},
                 }
             };
+            _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+            return response;
+        }
+
+        private APIGatewayProxyResponse CreateBadRequestResponse()
+        {
+            var response = new APIGatewayProxyResponse
+                {StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
+            _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+            return response;
         }
     }
 }

@@ -40,8 +40,10 @@ namespace HelloWorld
             }
             catch (Exception e)
             {
-                _logger.Log(e.ToString());
-                return DefaultServerResponse.CreateServerErrorResponse();
+                var response = DefaultServerResponse.CreateServerErrorResponse();
+                _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+                _logger.Log(e.ToString()); 
+                return response;
             }
         }
 

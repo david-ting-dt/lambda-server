@@ -11,6 +11,7 @@ namespace HelloWorld.Tests
     public class DeletePersonHandlerTest
     {
         private readonly Mock<IDbHandler> _mockDbHandler;
+        private readonly Mock<ILogger> _mockLogger;
         private readonly APIGatewayProxyRequest _deleteRequest = new APIGatewayProxyRequest
         {
             PathParameters = new Dictionary<string, string>{{"id", "1"}}
@@ -19,12 +20,13 @@ namespace HelloWorld.Tests
         public DeletePersonHandlerTest()
         {
             _mockDbHandler = new Mock<IDbHandler>();
+            _mockLogger = new Mock<ILogger>();
         }
 
         [Fact]
         public async Task DeletePerson_ShouldCallDbHandlerDeleteAsyncOnce()
         {
-            var handler = new DeletePersonHandler(_mockDbHandler.Object);
+            var handler = new DeletePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             await handler.DeletePerson(_deleteRequest);
             _mockDbHandler.Verify(db => db.DeletePersonAsync("1"), Times.Once);
         }
@@ -32,9 +34,17 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task DeletePerson_ShouldReturnResponseStatusCode204_IfDeleteSuccessfully()
         {
-            var handler = new DeletePersonHandler(_mockDbHandler.Object);
+            var handler = new DeletePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.DeletePerson(_deleteRequest);
             Assert.Equal(204, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task DeletePerson_ShouldCallLoggerLogMethodAtLeastOnce()
+        {
+            var handler = new DeletePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
+            await handler.DeletePerson(_deleteRequest);
+            _mockLogger.Verify(logger => logger.Log(It.IsAny<string>()), Times.AtLeastOnce);
         }
 
         [Fact]
@@ -43,7 +53,7 @@ namespace HelloWorld.Tests
             _mockDbHandler
                 .Setup(db => db.DeletePersonAsync(It.IsAny<string>()))
                 .Throws(new Exception());
-            var handler = new DeletePersonHandler(_mockDbHandler.Object);
+            var handler = new DeletePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.DeletePerson(_deleteRequest);
             Assert.Equal(500, response.StatusCode);
         }
@@ -54,7 +64,7 @@ namespace HelloWorld.Tests
             _mockDbHandler
                 .Setup(db => db.DeletePersonAsync(It.IsAny<string>()))
                 .Throws(new NullReferenceException());
-            var handler = new DeletePersonHandler(_mockDbHandler.Object);
+            var handler = new DeletePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.DeletePerson(_deleteRequest);
             Assert.Equal(404, response.StatusCode);
         }

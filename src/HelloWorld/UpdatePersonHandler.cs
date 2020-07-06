@@ -5,6 +5,7 @@ using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using HelloWorld.Interfaces;
+using Newtonsoft.Json;
 
 namespace HelloWorld
 {
@@ -14,32 +15,35 @@ namespace HelloWorld
     public class UpdatePersonHandler
     {
         private readonly IDbHandler _dbHandler;
+        private readonly ILogger _logger;
 
         public UpdatePersonHandler()
         {
             var dbContext = new DynamoDBContext(new AmazonDynamoDBClient());
             _dbHandler = new DynamoDbHandler(dbContext);
+            _logger = new LambdaFnLogger();
         }
 
-        public UpdatePersonHandler(IDbHandler dbHandler)
+        public UpdatePersonHandler(IDbHandler dbHandler, ILogger logger)
         {
             _dbHandler = dbHandler;
+            _logger = logger;
         }
 
         public async Task<APIGatewayProxyResponse> UpdatePerson(APIGatewayProxyRequest request)
         {
+            _logger.Log($"API GATEWAY REQUEST: {JsonConvert.SerializeObject(request)}");
             try
             {
-                return await CreateResponse(request);
-            }
-            catch (NullReferenceException)
-            {
-                return new APIGatewayProxyResponse { StatusCode = 404, Body = "Resource not found" };
+                var isRequestValid = Validator.ValidateRequest(request.Body);
+                return isRequestValid ? await CreateResponse(request) : CreateBadRequestResponse();
             }
             catch (Exception e)
             {
-                LambdaLogger.Log(e.ToString());
-                return DefaultServerResponse.CreateServerErrorResponse();
+                var response = DefaultServerResponse.CreateServerErrorResponse();
+                _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+                _logger.Log(e.ToString());
+                return response;
             }
         }
 
@@ -47,12 +51,26 @@ namespace HelloWorld
         {
             var id = request.PathParameters["id"];
             var newName = request.Body;
-            var isRequestValid = Validator.ValidateRequest(newName);
-            if (!isRequestValid)
-                return new APIGatewayProxyResponse { StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
+            APIGatewayProxyResponse response;
+            try
+            {
+                await _dbHandler.UpdatePersonAsync(id, newName);
+                response = new APIGatewayProxyResponse { StatusCode = 301};
+            }
+            catch (NullReferenceException)
+            {
+                response = new APIGatewayProxyResponse { StatusCode = 404, Body = "Resource not found" };
+            }
+            _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+            return response;
+        }
 
-            await _dbHandler.UpdatePersonAsync(id, newName);
-            return new APIGatewayProxyResponse { StatusCode = 301};
+        private APIGatewayProxyResponse CreateBadRequestResponse()
+        {
+            var response = new APIGatewayProxyResponse
+                {StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
+            _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+            return response;
         }
     }
 }

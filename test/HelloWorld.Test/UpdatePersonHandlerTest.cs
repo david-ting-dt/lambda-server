@@ -11,6 +11,7 @@ namespace HelloWorld.Tests
     public class UpdatePersonHandlerTest
     {
         private readonly Mock<IDbHandler> _mockDbHandler;
+        private readonly Mock<ILogger> _mockLogger;
         private readonly APIGatewayProxyRequest _updateRequest = new APIGatewayProxyRequest
         {
             Body = "New_Name",
@@ -20,20 +21,29 @@ namespace HelloWorld.Tests
         public UpdatePersonHandlerTest()
         {
             _mockDbHandler = new Mock<IDbHandler>();
+            _mockLogger = new Mock<ILogger>();
         }
 
         [Fact]
         public async Task UpdatePerson_ShouldCallDbHandlerUpdatePersonAsyncOnce()
         {
-            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             await handler.UpdatePerson(_updateRequest);
             _mockDbHandler.Verify(db => db.UpdatePersonAsync("1", "New_Name"), Times.Once);
         }
 
         [Fact]
+        public async Task UpdatePerson_ShouldCallLoggerLogMethodAtLeastOnce()
+        {
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
+            await handler.UpdatePerson(_updateRequest);
+            _mockLogger.Verify(logger => logger.Log(It.IsAny<string>()), Times.AtLeastOnce);
+        }
+
+        [Fact]
         public async Task UpdatePerson_ShouldReturnResponseStatusCode301_IfUpdateSuccessfully()
         {
-            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.UpdatePerson(_updateRequest);
 
             Assert.Equal(301, response.StatusCode);
@@ -42,7 +52,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task UpdatePerson_ShouldReturnResponseStatusCode400_IfRequestBodyLengthGreaterThan30()
         {
-            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var request = new APIGatewayProxyRequest
             {
                 Body = "the_length_of_the_request_body_is_greater_than_30",
@@ -55,7 +65,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task UpdatePerson_ShouldNotCallDbHandlerUpdatePersonAsync_IfRequestBodyLengthGreaterThan30()
         {
-            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var request = new APIGatewayProxyRequest
             {
                 Body = "the_length_of_the_request_body_is_greater_than_30",
@@ -74,7 +84,7 @@ namespace HelloWorld.Tests
                 .Setup(db => db.UpdatePersonAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new Exception());
             
-            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.UpdatePerson(_updateRequest);
             Assert.Equal(500, response.StatusCode);
         }
@@ -85,7 +95,7 @@ namespace HelloWorld.Tests
             _mockDbHandler
                 .Setup(db => db.UpdatePersonAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new NullReferenceException());
-            var handler = new UpdatePersonHandler(_mockDbHandler.Object);
+            var handler = new UpdatePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.UpdatePerson(_updateRequest);
             Assert.Equal(404, response.StatusCode);
         }
