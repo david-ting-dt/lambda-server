@@ -86,7 +86,6 @@ Resources:
   LambdaErrorAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmName: david-ting-helloworld-lambda-error-alarm
       AlarmDescription: "Alarm if lambda errors out too many times"
       Namespace: AWS/Lambda
       MetricName: Errors
@@ -99,4 +98,3 @@ Resources:
       Threshold: 1
       EvaluationPeriods: 5
       Period: 60
-      TreatMissingData: breaching
