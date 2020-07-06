@@ -93,7 +93,7 @@ Resources:
       Dimensions:
         - Name: FunctionName
           Value: HelloWorldDNFunction
-      Statistics: Sum
+      Statistic: Sum
       ComparisonOperator: GreaterThanThreshold
       Threshold: 0
       EvaluationPeriods: 5
