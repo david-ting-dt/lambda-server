@@ -7,6 +7,7 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
 using Newtonsoft.Json;
+using ILogger = HelloWorld.Interfaces.ILogger;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -16,27 +17,30 @@ namespace HelloWorld
     public class HelloWorldHandler
     {
         private readonly IDbHandler _dbHandler;
+        private readonly ILogger _logger;
 
         public HelloWorldHandler()
         {
             _dbHandler = new DynamoDbHandler(new AmazonDynamoDBClient());
+            _logger = new LambdaFnLogger();
         }
 
-        public HelloWorldHandler(IDbHandler dbHandler)
+        public HelloWorldHandler(IDbHandler dbHandler, ILogger logger)
         {
             _dbHandler = dbHandler;
+            _logger = logger;
         }
 
         public async Task<APIGatewayProxyResponse> HelloWorld(APIGatewayProxyRequest request)
         { 
-            LambdaLogger.Log($"API GATEWAY REQUEST: {JsonConvert.SerializeObject(request)}");
+            _logger.Log($"API GATEWAY REQUEST: {JsonConvert.SerializeObject(request)}");
             try
             {
                 return await CreateResponse();
             }
             catch (Exception e)
             {
-                LambdaLogger.Log(e.ToString());
+                _logger.Log(e.ToString());
                 return DefaultServerResponse.CreateServerErrorResponse();
             }
         }
@@ -52,7 +56,7 @@ namespace HelloWorld
                 StatusCode = 200,
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
-            LambdaLogger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+            _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
             return response;
         }
 
