@@ -92,7 +92,8 @@ Resources:
       MetricName: Errors
       Dimensions:
         - Name: FunctionName
-          Value: HelloWorldDNFunction
+          Value: 
+            Ref: HelloWorldDNFunction
       Statistic: Sum
       ComparisonOperator: GreaterThanThreshold
       Threshold: 1
