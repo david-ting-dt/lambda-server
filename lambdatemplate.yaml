@@ -107,3 +107,30 @@ Resources:
         - Name: FunctionName
           Value:
             Ref: GetPeopleDNFunction
+            
+  AddPersonDNFunctionAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      <<: *alarmProps
+      Dimensions:
+        - Name: FunctionName
+          Value:
+            Ref: AddPersonDNFunction
+
+  DeletePersonDNFunctionAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      <<: *alarmProps
+      Dimensions:
+        - Name: FunctionName
+          Value:
+            Ref: DeletePersonDNFunction
+
+  UpdatePersonDNFunctionAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      <<: *alarmProps
+      Dimensions:
+        - Name: FunctionName
+          Value:
+            Ref: UpdatePersonDNFunction
