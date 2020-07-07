@@ -83,7 +83,7 @@ Resources:
             Path: /people/{id}
             Method: PUT
 
-  LambdaErrorAlarm:
+  HelloWorldDNFunctionAlarm: &alarmProps
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmDescription: "Alarm if lambda errors out too many times"
@@ -98,3 +98,10 @@ Resources:
       Threshold: 1
       EvaluationPeriods: 5
       Period: 60
+
+  GetPeopleDNFunctionAlarm: *alarmProps
+    Properties:
+      Dimensions:
+        - Name: FunctionName
+          Value:
+            Ref: GetPeopleDNFunction
