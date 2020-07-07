@@ -101,7 +101,8 @@ Resources:
 
   GetPeopleDNFunctionAlarm:
     Type: AWS::CloudWatch::Alarm
-    <<: *alarmProps
+    Properties:
+      <<: *alarmProps
       Dimensions:
         - Name: FunctionName
           Value:
