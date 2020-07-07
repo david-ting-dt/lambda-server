@@ -99,7 +99,8 @@ Resources:
       EvaluationPeriods: 5
       Period: 60
 
-  GetPeopleDNFunctionAlarm: *alarmProps
+  GetPeopleDNFunctionAlarm:
+    <<: *alarmProps
     Properties:
       Dimensions:
         - Name: FunctionName
