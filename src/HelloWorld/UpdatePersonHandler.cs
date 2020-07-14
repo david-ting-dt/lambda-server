@@ -4,13 +4,9 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
-using Newtonsoft.Json;
 
 namespace HelloWorld
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class UpdatePersonHandler
     {
         private readonly IDbHandler _dbHandler;
@@ -31,7 +27,7 @@ namespace HelloWorld
 
         public async Task<APIGatewayProxyResponse> UpdatePerson(APIGatewayProxyRequest request)
         {
-            _logger.Log($"API GATEWAY REQUEST: {JsonConvert.SerializeObject(request)}");
+            _logger.Log($"API Gateway request received - HttpMethod: {request.HttpMethod}  Path: {request.Path}");
             try
             {
                 var isRequestValid = Validator.ValidateRequest(request.Body);
@@ -40,7 +36,7 @@ namespace HelloWorld
             catch (Exception e)
             {
                 var response = DefaultServerResponse.CreateServerErrorResponse();
-                _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+                _logger.Log($"API Gateway response produced - StatusCode: {response.StatusCode}  Body: {response.Body}");
                 _logger.Log(e.ToString());
                 return response;
             }
@@ -60,7 +56,7 @@ namespace HelloWorld
             {
                 response = new APIGatewayProxyResponse { StatusCode = 404, Body = "Resource not found" };
             }
-            _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+            _logger.Log($"API Gateway response produced - StatusCode: {response.StatusCode}  Body: {response.Body}");
             return response;
         }
 
@@ -68,7 +64,7 @@ namespace HelloWorld
         {
             var response = new APIGatewayProxyResponse
                 {StatusCode = 400, Body = "Invalid request - name must be between 0 and 30 characters"};
-            _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+            _logger.Log($"API Gateway response produced - StatusCode: {response.StatusCode}  Body: {response.Body}");
             return response;
         }
     }

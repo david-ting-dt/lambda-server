@@ -6,8 +6,6 @@ using Amazon.DynamoDBv2;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
 using HelloWorld.Interfaces;
-using Newtonsoft.Json;
-using ILogger = HelloWorld.Interfaces.ILogger;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -33,7 +31,7 @@ namespace HelloWorld
 
         public async Task<APIGatewayProxyResponse> HelloWorld(APIGatewayProxyRequest request)
         { 
-            _logger.Log($"API GATEWAY REQUEST: {JsonConvert.SerializeObject(request)}");
+            _logger.Log($"API Gateway request received - HttpMethod: {request.HttpMethod}  Path: {request.Path}");
             try
             {
                 return await CreateResponse();
@@ -41,7 +39,7 @@ namespace HelloWorld
             catch (Exception e)
             {
                 var response = DefaultServerResponse.CreateServerErrorResponse();
-                _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+                _logger.Log($"API Gateway response produced - StatusCode: {response.StatusCode}  Body: {response.Body}");
                 _logger.Log(e.ToString()); 
                 return response;
             }
@@ -58,7 +56,7 @@ namespace HelloWorld
                 StatusCode = 200,
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
-            _logger.Log($"API GATEWAY RESPONSE: {JsonConvert.SerializeObject(response)}");
+            _logger.Log($"API Gateway response produced - StatusCode: {response.StatusCode}  Body: {response.Body}");
             return response;
         }
 
