@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
+using HelloWorld.DbItem;
 using HelloWorld.Interfaces;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace HelloWorld.Tests
@@ -32,11 +34,18 @@ namespace HelloWorld.Tests
         }
 
         [Fact]
-        public async Task DeletePerson_ShouldReturnResponseStatusCode204_IfDeleteSuccessfully()
+        public async Task DeletePerson_ShouldReturnExpectedResponse_IfDeleteSuccessfully()
         {
+            _mockDbHandler
+                .Setup(dbHandler => dbHandler.DeletePersonAsync(It.IsAny<string>()))
+                .ReturnsAsync(new Person{Name = "David"});
             var handler = new DeletePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.DeletePerson(_deleteRequest);
-            Assert.Equal(204, response.StatusCode);
+            var expected = new APIGatewayProxyResponse { StatusCode = 204, Body = "David"};
+
+            var responseJson = JsonConvert.SerializeObject(response);
+            var expectedJson = JsonConvert.SerializeObject(expected);
+            Assert.Equal(expectedJson, responseJson);
         }
 
         [Fact]

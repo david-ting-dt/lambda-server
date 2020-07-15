@@ -47,8 +47,8 @@ namespace HelloWorld
             APIGatewayProxyResponse response;
             try
             {
-                await _dbHandler.DeletePersonAsync(id);
-                response = new APIGatewayProxyResponse {StatusCode = 204};
+                var deletedPerson = await _dbHandler.DeletePersonAsync(id);
+                response = new APIGatewayProxyResponse {StatusCode = 204, Body = deletedPerson.Name};
             }
             catch (NullReferenceException)
             {

@@ -51,12 +51,13 @@ namespace HelloWorld
             await _dbContext.SaveAsync(newPerson);
         }
 
-        public async Task DeletePersonAsync(string id)
+        public async Task<Person> DeletePersonAsync(string id)
         {
             var personToDelete = await _dbContext.LoadAsync<Person>(id);
             if (personToDelete == null)
                 throw new NullReferenceException();
             await _dbContext.DeleteAsync(personToDelete);
+            return personToDelete;
         }
 
         public async Task UpdatePersonAsync(string id, string newName)

@@ -8,7 +8,7 @@ namespace HelloWorld.Interfaces
     {
         Task<List<Person>> GetPeopleAsync();
         Task AddPersonAsync(string id, string name);
-        Task DeletePersonAsync(string id);
+        Task<Person> DeletePersonAsync(string id);
         Task UpdatePersonAsync(string id, string newName);
     }
 }
