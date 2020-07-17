@@ -10,6 +10,9 @@ using HelloWorld.Interfaces;
 
 namespace HelloWorld
 {
+    /// <summary>
+    /// Provides implementations for CRUD operations with AWS DynamoDB
+    /// </summary>
     public class DynamoDbHandler : IDbHandler
     {
         private readonly IAmazonDynamoDB _dbClient;

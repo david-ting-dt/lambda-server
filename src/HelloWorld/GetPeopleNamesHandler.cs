@@ -8,6 +8,9 @@ using HelloWorld.Interfaces;
 
 namespace HelloWorld
 {
+    /// <summary>
+    /// Function code for AWS Lambda Function - GetPeopleDNFunction
+    /// </summary>
     public class GetPeopleNamesHandler
     {
         private readonly IDbHandler _dbHandler;

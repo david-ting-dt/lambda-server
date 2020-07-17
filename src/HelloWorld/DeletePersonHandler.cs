@@ -7,6 +7,9 @@ using HelloWorld.Interfaces;
 
 namespace HelloWorld
 {
+    /// <summary>
+    /// Function code for AWS Lambda Function - DeletePersonDNFunction
+    /// </summary>
     public class DeletePersonHandler
     {
         private readonly IDbHandler _dbHandler;

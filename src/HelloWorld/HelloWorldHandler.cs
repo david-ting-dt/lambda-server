@@ -11,7 +11,9 @@ using HelloWorld.Interfaces;
 
 namespace HelloWorld
 {
-
+    /// <summary>
+    /// Function code for AWS Lambda Function - HelloWorldDNFunction
+    /// </summary>
     public class HelloWorldHandler
     {
         private readonly IDbHandler _dbHandler;

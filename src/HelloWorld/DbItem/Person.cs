@@ -2,6 +2,9 @@ using Amazon.DynamoDBv2.DataModel;
 
 namespace HelloWorld.DbItem
 {
+    /// <summary>
+    /// Maps to the Person item in database People Table
+    /// </summary>
     [DynamoDBTable("People")]
     public class Person
     {

@@ -4,6 +4,9 @@ using HelloWorld.DbItem;
 
 namespace HelloWorld.Interfaces
 {
+    /// <summary>
+    /// Defines the expected CRUD methods of database handlers
+    /// </summary>
     public interface IDbHandler
     {
         Task<List<Person>> GetPeopleAsync();
