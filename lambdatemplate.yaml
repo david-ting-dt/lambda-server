@@ -16,6 +16,8 @@ Resources:
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Canary10Percent5Minutes
+        Alarms:
+          - !Ref LambdaFunctionErrorGreaterThanOneAlarm
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -89,10 +91,10 @@ Resources:
       AlarmDescription: "Triggered if Lambda Function errors out at least once"
       Namespace: AWS/Lambda
       MetricName: Errors
-      Dimensions:
-        - Name: FunctionName
-          Value: 
-            Ref: HelloWorldDNFunction
+#      Dimensions:
+#        - Name: FunctionName
+#          Value: 
+#            Ref: HelloWorldDNFunction
       Statistic: Sum
       ComparisonOperator: GreaterThanOrEqualToThreshold
       Threshold: 1
@@ -134,3 +136,15 @@ Resources:
         - Name: FunctionName
           Value:
             Ref: UpdatePersonDNFunction
+
+  LambdaFunctionErrorGreaterThanOneAlarm:
+    Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmDescription: "Triggered if Lambda Function errors out at least once"
+        Namespace: AWS/Lambda
+        MetricName: Errors
+        Statistic: Sum
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+        Threshold: 1
+        EvaluationPeriods: 5
+        Period: 60
