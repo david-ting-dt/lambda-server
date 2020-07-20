@@ -57,17 +57,6 @@ namespace HelloWorld.Tests
         }
 
         [Fact]
-        public async Task DeletePerson_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
-        {
-            _mockDbHandler
-                .Setup(db => db.DeletePersonAsync(It.IsAny<string>()))
-                .Throws(new Exception());
-            var handler = new DeletePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
-            var response = await handler.DeletePerson(_deleteRequest);
-            Assert.Equal(500, response.StatusCode);
-        }
-
-        [Fact]
         public async Task DeletePerson_ShouldReturnResponseStatusCode404_IfNullReferenceExceptionCaught()
         {
             _mockDbHandler

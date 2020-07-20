@@ -32,6 +32,7 @@ namespace HelloWorld.Tests
       [Fact]
       public async Task HelloWorld_ShouldCallDbHandlerGetPeopleAsyncOnce()
       {
+          SetupMockDbHandlerToReturnFakePeopleData();
           var handler = new HelloWorldHandler(_mockDbHandler.Object, _mockLogger.Object);
           await handler.HelloWorld(_fakeRequest);
           _mockDbHandler.Verify(db => db.GetPeopleAsync(), Times.Once);
@@ -40,6 +41,7 @@ namespace HelloWorld.Tests
       [Fact]
       public async Task HelloWorld_ShouldCallLoggerLogMethodAtLeastOnce()
       {
+          SetupMockDbHandlerToReturnFakePeopleData();
           var handler = new HelloWorldHandler(_mockDbHandler.Object, _mockLogger.Object);
           await handler.HelloWorld(_fakeRequest);
           _mockLogger.Verify(logger => logger.Log(It.IsAny<string>()), Times.AtLeastOnce);
@@ -48,9 +50,7 @@ namespace HelloWorld.Tests
       [Fact]
       public async Task HelloWorld_ShouldReturnStatusCode200_IfSuccessful()
       {
-          _mockDbHandler
-              .Setup(db => db.GetPeopleAsync())
-              .ReturnsAsync(_people);
+          SetupMockDbHandlerToReturnFakePeopleData();
           var handler = new HelloWorldHandler(_mockDbHandler.Object, _mockLogger.Object);
           var response = await handler.HelloWorld(_fakeRequest);
           Assert.Equal(200, response.StatusCode);
@@ -71,16 +71,11 @@ namespace HelloWorld.Tests
           Assert.Equal(expected, response.Body);
       }
       
-      [Fact]
-      public async Task HelloWorld_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
+      private void SetupMockDbHandlerToReturnFakePeopleData()
       {
           _mockDbHandler
               .Setup(db => db.GetPeopleAsync())
-              .Throws(new Exception());
-          var handler = new HelloWorldHandler(_mockDbHandler.Object, _mockLogger.Object);
-          var response = await handler.HelloWorld(_fakeRequest);
-          Assert.Equal(500, response.StatusCode);
+              .ReturnsAsync(_people);
       }
-
   }
 }

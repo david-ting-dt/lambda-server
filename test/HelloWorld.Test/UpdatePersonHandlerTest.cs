@@ -78,18 +78,6 @@ namespace HelloWorld.Tests
         }
 
         [Fact]
-        public async Task UpdatePerson_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
-        {
-            _mockDbHandler
-                .Setup(db => db.UpdatePersonAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .Throws(new Exception());
-            
-            var handler = new UpdatePersonHandler(_mockDbHandler.Object, _mockLogger.Object);
-            var response = await handler.UpdatePerson(_updateRequest);
-            Assert.Equal(500, response.StatusCode);
-        }
-
-        [Fact]
         public async Task UpdatePerson_ShouldReturnResponseStatusCode404_IfNullReferenceExceptionIsCaught()
         {
             _mockDbHandler

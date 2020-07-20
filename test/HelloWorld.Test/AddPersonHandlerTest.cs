@@ -56,16 +56,5 @@ namespace HelloWorld.Tests
             var response = await handler.AddPerson(request);
             Assert.Equal(400, response.StatusCode);
         }
-
-        [Fact]
-        public async Task AddPerson_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
-        {
-            _mockDbHandler
-                .Setup(db => db.AddPersonAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .Throws(new Exception());
-            var handler = new AddPersonHandler(_mockDbHandler.Object, _mockLogger.Object);
-            var response = await handler.AddPerson(_fakeRequest);
-            Assert.Equal(500, response.StatusCode);
-        }
     }
 }

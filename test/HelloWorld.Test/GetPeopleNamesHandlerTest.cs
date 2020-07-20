@@ -30,6 +30,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task GetPeopleNames_ShouldCallDbHandlerGetPeopleAsyncOnce()
         {
+            SetupMockDbHandlerToReturnFakePeopleData();
             var handler = new GetPeopleNamesHandler(_mockDbHandler.Object, _mockLogger.Object);
             await handler.GetPeopleNames(_fakeRequest);
             _mockDbHandler.Verify(db => db.GetPeopleAsync(), Times.Once);
@@ -38,6 +39,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task GetPeopleNames_ShouldCallLoggerLogMethodAtLeastOnce()
         {
+            SetupMockDbHandlerToReturnFakePeopleData();
             var handler = new GetPeopleNamesHandler(_mockDbHandler.Object, _mockLogger.Object);
             await handler.GetPeopleNames(_fakeRequest);
             _mockLogger.Verify(logger => logger.Log(It.IsAny<string>()), Times.AtLeastOnce);
@@ -46,9 +48,7 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task GetPeopleNames_ShouldReturnResponseStatusCode200_IfSuccessful()
         {
-            _mockDbHandler
-                .Setup(db => db.GetPeopleAsync())
-                .ReturnsAsync(_people);
+            SetupMockDbHandlerToReturnFakePeopleData();
             var handler = new GetPeopleNamesHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.GetPeopleNames(_fakeRequest);
             Assert.Equal(200, response.StatusCode);
@@ -57,24 +57,18 @@ namespace HelloWorld.Tests
         [Fact]
         public async Task GetPeopleNames_ShouldReturnCorrectResponseBody_IfSuccessful()
         {
-            _mockDbHandler
-                .Setup(db => db.GetPeopleAsync())
-                .ReturnsAsync(_people);
+            SetupMockDbHandlerToReturnFakePeopleData();
             var handler = new GetPeopleNamesHandler(_mockDbHandler.Object, _mockLogger.Object);
             var response = await handler.GetPeopleNames(_fakeRequest);
             const string expected = "David, Michael, Will";
             Assert.Equal(expected, response.Body);
         }
 
-        [Fact]
-        public async Task GetPeopleNames_ShouldReturnResponseStatusCode500_IfExceptionIsThrown()
+        private void SetupMockDbHandlerToReturnFakePeopleData()
         {
             _mockDbHandler
                 .Setup(db => db.GetPeopleAsync())
-                .Throws(new Exception());
-            var handler = new GetPeopleNamesHandler(_mockDbHandler.Object, _mockLogger.Object);
-            var response = await handler.GetPeopleNames(_fakeRequest);
-            Assert.Equal(500, response.StatusCode);
+                .ReturnsAsync(_people);
         }
     }
 }
