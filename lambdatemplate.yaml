@@ -86,7 +86,7 @@ Resources:
   HelloWorldDNFunctionAlarm: 
     Type: AWS::CloudWatch::Alarm
     Properties: &alarmProps
-      AlarmDescription: "Alarm if lambda errors out too many times"
+      AlarmDescription: "Triggered if Lambda Function errors out at least once"
       Namespace: AWS/Lambda
       MetricName: Errors
       Dimensions:
@@ -94,7 +94,7 @@ Resources:
           Value: 
             Ref: HelloWorldDNFunction
       Statistic: Sum
-      ComparisonOperator: GreaterThanThreshold
+      ComparisonOperator: GreaterThanOrEqualToThreshold
       Threshold: 1
       EvaluationPeriods: 5
       Period: 60
