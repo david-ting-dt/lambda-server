@@ -39,8 +39,8 @@ namespace HelloWorld
             {
                 var response = DefaultServerResponse.CreateServerErrorResponse();
                 _logger.Log($"API Gateway response produced - StatusCode: {response.StatusCode}  Body: {response.Body}");
-                _logger.Log(e.ToString()); 
-                return response;
+                _logger.Log(e.ToString());
+                throw;
             }
         }
 
