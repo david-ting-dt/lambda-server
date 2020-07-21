@@ -36,7 +36,8 @@ namespace HelloWorld
             _logger.Log($"API Gateway request received - HttpMethod: {request.HttpMethod}  Path: {request.Path}");
             try
             {
-                return await CreateResponse();
+                // return await CreateResponse();
+                throw new Exception("test");
             }
             catch (Exception e)
             {
