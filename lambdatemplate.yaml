@@ -17,7 +17,7 @@ Resources:
       DeploymentPreference:
         Type: Canary10Percent5Minutes
         Alarms:
-          - !Ref HelloWorldDNFunctionAlarm
+          - !Ref LambdaErrorGreaterThanOrEqualToOneAlarm
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -34,7 +34,7 @@ Resources:
       DeploymentPreference:
         Type: Canary10Percent5Minutes
         Alarms:
-          - !Ref GetPeopleDNFunctionAlarm
+          - !Ref LambdaErrorGreaterThanOrEqualToOneAlarm
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -51,7 +51,7 @@ Resources:
       DeploymentPreference:
         Type: Canary10Percent5Minutes
         Alarms:
-          - !Ref AddPersonDNFunctionAlarm
+          - !Ref LambdaErrorGreaterThanOrEqualToOneAlarm
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -68,7 +68,7 @@ Resources:
       DeploymentPreference:
         Type: Canary10Percent5Minutes
         Alarms:
-          - !Ref DeletePersonDNFunctionAlarm
+          - !Ref LambdaErrorGreaterThanOrEqualToOneAlarm
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -85,7 +85,7 @@ Resources:
       DeploymentPreference:
         Type: Canary10Percent5Minutes
         Alarms:
-          - !Ref UpdatePersonDNFunctionAlarm
+          - !Ref LambdaErrorGreaterThanOrEqualToOneAlarm
       Events:
         HelloWorldDNApi:
           Type: Api
@@ -93,9 +93,9 @@ Resources:
             Path: /people/{id}
             Method: PUT
 
-  HelloWorldDNFunctionAlarm: 
+  LambdaErrorGreaterThanOrEqualToOneAlarm: 
     Type: AWS::CloudWatch::Alarm
-    Properties: &alarmProps
+    Properties:
       AlarmDescription: "Triggered if Lambda Function errors out at least once"
       Namespace: AWS/Lambda
       MetricName: Errors
@@ -105,38 +105,23 @@ Resources:
       DatapointsToAlarm: 1
       EvaluationPeriods: 5
       Period: 60
-      Dimensions:
-        - Name: LambdaFunctionName
-          Value: !Ref HelloWorldDNFunction
 
-  GetPeopleDNFunctionAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      <<: *alarmProps
-      Dimensions:
-        - Name: LambdaFunctionName
-          Value: !Ref GetPeopleDNFunction
-            
-  AddPersonDNFunctionAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      <<: *alarmProps
-      Dimensions:
-        - Name: LambdaFunctionName
-          Value: !Ref AddPersonDNFunction
-
-  DeletePersonDNFunctionAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      <<: *alarmProps
-      Dimensions:
-        - Name: LambdaFunctionName
-          Value: !Ref DeletePersonDNFunction
-
-  UpdatePersonDNFunctionAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      <<: *alarmProps
-      Dimensions:
-        - Name: LambdaFunctionName
-          Value: !Ref UpdatePersonDNFunction
+#  GetPeopleDNFunctionAlarm:
+#    Type: AWS::CloudWatch::Alarm
+#    Properties:
+#      <<: *alarmProps
+#            
+#  AddPersonDNFunctionAlarm:
+#    Type: AWS::CloudWatch::Alarm
+#    Properties:
+#      <<: *alarmProps
+#
+#  DeletePersonDNFunctionAlarm:
+#    Type: AWS::CloudWatch::Alarm
+#    Properties:
+#      <<: *alarmProps
+#
+#  UpdatePersonDNFunctionAlarm:
+#    Type: AWS::CloudWatch::Alarm
+#    Properties:
+#      <<: *alarmProps
