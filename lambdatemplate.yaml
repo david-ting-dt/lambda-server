@@ -105,23 +105,3 @@ Resources:
       DatapointsToAlarm: 1
       EvaluationPeriods: 5
       Period: 60
-
-#  GetPeopleDNFunctionAlarm:
-#    Type: AWS::CloudWatch::Alarm
-#    Properties:
-#      <<: *alarmProps
-#            
-#  AddPersonDNFunctionAlarm:
-#    Type: AWS::CloudWatch::Alarm
-#    Properties:
-#      <<: *alarmProps
-#
-#  DeletePersonDNFunctionAlarm:
-#    Type: AWS::CloudWatch::Alarm
-#    Properties:
-#      <<: *alarmProps
-#
-#  UpdatePersonDNFunctionAlarm:
-#    Type: AWS::CloudWatch::Alarm
-#    Properties:
-#      <<: *alarmProps
