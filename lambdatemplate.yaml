@@ -105,23 +105,38 @@ Resources:
       DatapointsToAlarm: 1
       EvaluationPeriods: 5
       Period: 60
+      Dimensions:
+        - Name: LambdaFunctionName
+          Value: !Ref HelloWorldDNFunction
 
   GetPeopleDNFunctionAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
       <<: *alarmProps
+      Dimensions:
+        - Name: LambdaFunctionName
+          Value: !Ref GetPeopleDNFunction
             
   AddPersonDNFunctionAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
       <<: *alarmProps
+      Dimensions:
+        - Name: LambdaFunctionName
+          Value: !Ref AddPersonDNFunction
 
   DeletePersonDNFunctionAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
       <<: *alarmProps
+      Dimensions:
+        - Name: LambdaFunctionName
+          Value: !Ref DeletePersonDNFunction
 
   UpdatePersonDNFunctionAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
       <<: *alarmProps
+      Dimensions:
+        - Name: LambdaFunctionName
+          Value: !Ref UpdatePersonDNFunction
