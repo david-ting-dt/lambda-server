@@ -13,7 +13,11 @@ namespace HelloWorld.Tests
     {
         private readonly Mock<IDbHandler> _mockDbHandler;
         private readonly Mock<ILogger> _mockLogger;
-        private readonly APIGatewayProxyRequest _fakeRequest = new APIGatewayProxyRequest { HttpMethod = "Get" };
+        private readonly APIGatewayProxyRequest _fakeRequest = new APIGatewayProxyRequest
+        {
+            HttpMethod = "Get", 
+            Path = "/people"
+        };
         private readonly List<Person> _people = new List<Person>
         {
             new Person { Id = "1", Name = "David" },
@@ -37,12 +41,27 @@ namespace HelloWorld.Tests
         }
 
         [Fact]
-        public async Task GetPeopleNames_ShouldCallLoggerLogMethodAtLeastOnce()
+        public async Task GetPeopleNames_ShouldLogReceivedAPIGatewayRequest()
         {
             SetupMockDbHandlerToReturnFakePeopleData();
             var handler = new GetPeopleNamesHandler(_mockDbHandler.Object, _mockLogger.Object);
             await handler.GetPeopleNames(_fakeRequest);
-            _mockLogger.Verify(logger => logger.Log(It.IsAny<string>()), Times.AtLeastOnce);
+            _mockLogger
+                .Verify(logger => logger.Log(
+                    $"API Gateway request received - HttpMethod: {_fakeRequest.HttpMethod}  Path: {_fakeRequest.Path}")
+                , Times.Once);
+        }
+        
+        [Fact]
+        public async Task GetPeopleNames_ShouldLogAPIGatewayResponseCreated_IfSuccessful()
+        {
+            SetupMockDbHandlerToReturnFakePeopleData();
+            var handler = new GetPeopleNamesHandler(_mockDbHandler.Object, _mockLogger.Object);
+            var response = await handler.GetPeopleNames(_fakeRequest);
+            _mockLogger
+                .Verify(logger => logger.Log(
+                        $"API Gateway response produced - StatusCode: {response.StatusCode}  Body: {response.Body}")
+                    , Times.Once);
         }
 
         [Fact]
@@ -69,6 +88,20 @@ namespace HelloWorld.Tests
             _mockDbHandler
                 .Setup(db => db.GetPeopleAsync())
                 .ReturnsAsync(_people);
+        }
+
+        [Fact]
+        public async Task GetPeopleNames_ShouldLogAPIGatewayResponseCreated_ExceptionThrown()
+        {
+            _mockDbHandler
+                .Setup(db => db.GetPeopleAsync())
+                .ThrowsAsync(new Exception());
+            var handler = new GetPeopleNamesHandler(_mockDbHandler.Object, _mockLogger.Object);
+            await Assert.ThrowsAsync<Exception>(async () => await handler.GetPeopleNames(_fakeRequest));
+            _mockLogger
+                .Verify(logger => logger.Log(
+                    $"API Gateway response produced - StatusCode: 500  Body: Internal server error"),
+                    Times.Once);
         }
     }
 }
